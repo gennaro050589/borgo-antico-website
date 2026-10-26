@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menukaart – Borgo Antico Zevenhuizen</title>
+    <!-- Tailwind CSS voor strakke en snelle opmaak -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-stone-50 text-stone-800 font-sans scroll-smooth">
+
+    <!-- Navigatiebalk (Sticky) -->
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-stone-200">
+        <div class="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="index.html" class="text-2xl font-serif tracking-wide text-stone-900">BORGO ANTICO</a>
+            <nav class="hidden md:flex gap-8 text-sm uppercase tracking-wider font-medium text-stone-600">
+                <a href="index.html" class="hover:text-stone-900 transition">Home</a>
+                <a href="menukaart.html" class="text-stone-900 font-semibold">Menukaart</a>
+                <a href="over-ons.html" class="hover:text-stone-900 transition">Over Ons</a>
+                <a href="contact.html" class="hover:text-stone-900 transition">Contact</a>
+            </nav>
+            <div class="flex items-center gap-3">
+                <a href="bestellen.html" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm">Bestellen</a>
+                <a href="contact.html" class="bg-stone-900 hover:bg-stone-800 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm">Reserveren</a>
+                <a href="account.html" class="bg-stone-800 hover:bg-stone-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm border border-amber-600/50">Inloggen</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Pagina Titel -->
+    <section class="bg-stone-900 text-white py-16 px-6 text-center">
+        <h1 class="text-4xl font-serif mb-3">Onze Menukaart</h1>
+        <p class="text-stone-300 text-sm uppercase tracking-widest">La Cucina Povera – Puur, vers en met liefde bereid</p>
+    </section>
+
+    <!-- Snelle Categorie-navigatiebalk (Blijft plakken net onder de hoofdnavigatie) -->
+    <nav class="sticky top-20 z-45 bg-stone-100 border-b border-stone-200 shadow-sm py-3 px-6 overflow-x-auto">
+        <div class="max-w-4xl mx-auto flex gap-6 text-sm font-medium uppercase tracking-wider whitespace-nowrap justify-start md:justify-center">
+            <a href="#antipasti" class="text-stone-700 hover:text-amber-700 transition">Antipasti</a>
+            <a href="#pizze" class="text-stone-700 hover:text-amber-700 transition">Pizze</a>
+            <a href="#paste" class="text-stone-700 hover:text-amber-700 transition">Paste</a>
+            <a href="#pesce" class="text-stone-700 hover:text-amber-700 transition">Vis</a>
+            <a href="#carne" class="text-stone-700 hover:text-amber-700 transition">Vlees</a>
+            <a href="#dolci" class="text-stone-700 hover:text-amber-700 transition">Desserts</a>
+        </div>
+    </nav>
+
+    <!-- Menukaart Inhoud -->
+    <main class="max-w-4xl mx-auto px-6 py-16 space-y-16">
+
+        <!-- 1. Antipasti -->
+        <section id="antipasti" class="scroll-mt-36">
+            <h2 class="text-2xl font-serif text-amber-700 border-b border-stone-300 pb-3 mb-6">Antipasti / Voorgerechten</h2>
+            <div class="space-y-6">
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Focaccia</h3><span class="font-semibold text-amber-700">€ 9,50</span></div>
+                    <p class="text-stone-600 text-sm">Huisgemaakt pizzabrood, rozemarijn, kruidenboter</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Zuppa del giorno</h3><span class="font-semibold text-amber-700">€ 6,50</span></div>
+                    <p class="text-stone-600 text-sm">Soep van de dag</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Prosciutto & melone</h3><span class="font-semibold text-amber-700">€ 15,50</span></div>
+                    <p class="text-stone-600 text-sm">San Daniele ham & meloen</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Carpaccio</h3><span class="font-semibold text-amber-700">€ 16,00</span></div>
+                    <p class="text-stone-600 text-sm">Dun gesneden ossenhaas met rucola en parmezaanse kaas</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Vitello tonnato</h3><span class="font-semibold text-stone-500 italic">Op aanvraag</span></div>
+                    <p class="text-stone-600 text-sm">Dun gesneden kalfsmuis met tonijnmayonaise</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Funghi trifolati</h3><span class="font-semibold text-amber-700">€ 11,50</span></div>
+                    <p class="text-stone-600 text-sm">Gebakken champignons</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Cocktail di gamberetti</h3><span class="font-semibold text-amber-700">€ 15,50</span></div>
+                    <p class="text-stone-600 text-sm">Garnalencocktail</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Salmone affumicato</h3><span class="font-semibold text-amber-700">€ 15,50</span></div>
+                    <p class="text-stone-600 text-sm">Gerookte zalm</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Mozzarella in carrozza</h3><span class="font-semibold text-amber-700">€ 15,00</span></div>
+                    <p class="text-stone-600 text-sm">Gebakken mozzarella in tomatensaus</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Insalata Caprese</h3><span class="font-semibold text-amber-700">€ 13,50</span></div>
+                    <p class="text-stone-600 text-sm">Salade van verse mozzarella & tomaat</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Insalata della casa</h3><span class="font-semibold text-amber-700">€ 11,50</span></div>
+                    <p class="text-stone-600 text-sm">Huissalade met tonijn</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Insalata mista / pomodori</h3><span class="font-semibold text-amber-700">€ 7,50</span></div>
+                    <p class="text-stone-600 text-sm">Gemengde- of tomatensalade naar keuze</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Pizze -->
+        <section id="pizze" class="scroll-mt-36">
+            <h2 class="text-2xl font-serif text-amber-700 border-b border-stone-300 pb-3 mb-6">Pizze</h2>
+            <div class="space-y-6">
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Carpaccio</h3><span class="font-semibold text-amber-700">€ 19,00</span></div>
+                    <p class="text-stone-600 text-sm">Tomatensaus, mozzarella fior di latte, rucola, carpaccio, parmezaanse kaas</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Margherita</h3><span class="font-semibold text-amber-700">€ 11,50</span></div>
+                    <p class="text-stone-600 text-sm">Tomatensaus, mozzarella fior di latte</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Chantalle / Vega</h3><span class="font-semibold text-amber-700">€ 15,00</span></div>
+                    <p class="text-stone-600 text-sm">Tomatensaus, mozzarella fior di latte, champignons, paprika, rode ui, zwarte olijven</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Funghi</h3><span class="font-semibold text-amber-700">€ 13,00</span></div>
+                    <p class="text-stone-600 text-sm">Tomatensaus, mozzarella fior di latte, champignons</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Salami</h3><span class="font-semibold text-amber-700">€ 13,00</span></div>
+                    <p class="text-stone-600 text-sm">Tomatensaus, mozzarella fior di latte, salami</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Prosciutto</h3><span class="font-semibold text-amber-700">€ 13,00</span></div>
+                    <p class="text-stone-600 text-sm">Tomatensaus, mozzarella fior di latte, ham</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Napoletana</h3><span class="font-semibold text-amber-700">€ 15,00</span></div>
+                    <p class="text-stone-600 text-sm">Tomatensaus, mozzarella fior di latte, ansjovis, zwarte olijven</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Quattro stagioni</h3><span class="font-semibold text-amber-700">€ 16,00</span></div>
+                    <p class="text-stone-600 text-sm">Tomatensaus, mozzarella fior di latte, ham, ananas, tonijn, paprika, champignons</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Tre formaggi</h3><span class="font-semibold text-amber-700">€ 16,00</span></div>
+                    <p class="text-stone-600 text-sm">Tomatensaus, mozzarella fior di latte, gorgonzola, parmezaanse kaas</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Pepperoncino</h3><span class="font-semibold text-amber-700">€ 14,00</span></div>
+                    <p class="text-stone-600 text-sm">Tomatensaus, mozzarella fior di latte, pikante salami, zwarte olijven</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Speciale</h3><span class="font-semibold text-amber-700">€ 16,00</span></div>
+                    <p class="text-stone-600 text-sm">Tomatensaus, mozzarella fior di latte, rucola, buffelmozzarella</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Capricciosa</h3><span class="font-semibold text-amber-700">€ 17,00</span></div>
+                    <p class="text-stone-600 text-sm">Tomatensaus, mozzarella fior di latte, ham, salami, champignons, paprika</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Parma</h3><span class="font-semibold text-amber-700">€ 19,50</span></div>
+                    <p class="text-stone-600 text-sm">Tomatensaus, mozzarella fior di latte, rucola, parmaham, buffelmozzarella</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Tartufo</h3><span class="font-semibold text-amber-700">€ 19,00</span></div>
+                    <p class="text-stone-600 text-sm">Tomatensaus, mozzarella fior di latte, truffel, rucola, parmezaanse kaas</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Salmone</h3><span class="font-semibold text-amber-700">€ 17,50</span></div>
+                    <p class="text-stone-600 text-sm">Tomatensaus, mozzarella fior di latte, rode ui, zalm</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Radicchio bianca</h3><span class="font-semibold text-amber-700">€ 16,50</span></div>
+                    <p class="text-stone-600 text-sm">Mozzarella fior di latte, gorgonzola, radicchio, walnoten</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Paste -->
+        <section id="paste" class="scroll-mt-36">
+            <h2 class="text-2xl font-serif text-amber-700 border-b border-stone-300 pb-3 mb-6">Paste</h2>
+            <div class="space-y-6">
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Spaghetti pomodoro</h3><span class="font-semibold text-amber-700">€ 11,00</span></div>
+                    <p class="text-stone-600 text-sm">Spaghetti, tomatensaus, parmezaanse kaas</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Spaghetti al ragù</h3><span class="font-semibold text-amber-700">€ 15,00</span></div>
+                    <p class="text-stone-600 text-sm">Spaghetti, tomatengehaktsaus (half om half), parmezaanse kaas</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Spaghetti amatriciana</h3><span class="font-semibold text-amber-700">€ 15,00</span></div>
+                    <p class="text-stone-600 text-sm">Spaghetti, cherrytomaatjes, laurier, pancetta, witte ui, parmezaanse kaas</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Spaghetti carbonara</h3><span class="font-semibold text-amber-700">€ 14,50</span></div>
+                    <p class="text-stone-600 text-sm">Spaghetti, ei, pancetta, room, parmezaanse kaas</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Spaghetti marinara</h3><span class="font-semibold text-amber-700">€ 18,50</span></div>
+                    <p class="text-stone-600 text-sm">Spaghetti, mosselen, vongole, garnalen, cherrytomaatjes, witte wijn</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Lasagna</h3><span class="font-semibold text-amber-700">€ 15,00</span></div>
+                    <p class="text-stone-600 text-sm">Lasagnabladen, gehaktsaus, bechamel, mozzarella fior di latte, parmezaanse kaas</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Penne tre formaggi</h3><span class="font-semibold text-amber-700">€ 14,00</span></div>
+                    <p class="text-stone-600 text-sm">Penne, gorgonzola, buffelmozzarella, parmezaanse kaas, room</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Penne al salmone</h3><span class="font-semibold text-amber-700">€ 15,00</span></div>
+                    <p class="text-stone-600 text-sm">Penne, zalm, ui, witte wijn, room, tomatensaus</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Ravioli casareccia</h3><span class="font-semibold text-amber-700">€ 18,50</span></div>
+                    <p class="text-stone-600 text-sm">Ravioli gevuld met ricotta en spinazie, saus van champignons, room, parmezaanse kaas</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Ravioli al salie</h3><span class="font-semibold text-amber-700">€ 18,50</span></div>
+                    <p class="text-stone-600 text-sm">Ravioli gevuld met ricotta en spinazie, saus van salie, room, tomatensaus</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Pasta del giorno</h3><span class="font-semibold text-stone-500 italic">Dagprijs</span></div>
+                    <p class="text-stone-600 text-sm">Pasta van de dag</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Pesce (Vis) -->
+        <section id="pesce" class="scroll-mt-36">
+            <h2 class="text-2xl font-serif text-amber-700 border-b border-stone-300 pb-3 mb-6">Pesce (Visgerechten)</h2>
+            <div class="space-y-6">
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Scampi al brandy</h3><span class="font-semibold text-amber-700">€ 29,50</span></div>
+                    <p class="text-stone-600 text-sm">In brandy gebakken garnalen</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Cozze marinara</h3><span class="font-semibold text-amber-700">€ 27,50</span></div>
+                    <p class="text-stone-600 text-sm">Gebakken mosselen</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Calamari fritti</h3><span class="font-semibold text-amber-700">€ 25,50</span></div>
+                    <p class="text-stone-600 text-sm">Gefrituurde inktvis</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Pesce del giorno</h3><span class="font-semibold text-stone-500 italic">Dagprijs</span></div>
+                    <p class="text-stone-600 text-sm">Vis van de dag</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Carne (Vlees) -->
+        <section id="carne" class="scroll-mt-36">
+            <h2 class="text-2xl font-serif text-amber-700 border-b border-stone-300 pb-3 mb-6">Carne (Vleesgerechten)</h2>
+            <div class="space-y-6">
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Saltimbocca romana</h3><span class="font-semibold text-amber-700">€ 29,50</span></div>
+                    <p class="text-stone-600 text-sm">Kalfsoester met parmaham en salie</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Filetto al tagliata di manzo</h3><span class="font-semibold text-amber-700">€ 34,50</span></div>
+                    <p class="text-stone-600 text-sm">Gegrilde ossenhaas met rucola en parmezaanse kaas</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Cotelette d'agnello</h3><span class="font-semibold text-amber-700">€ 34,50</span></div>
+                    <p class="text-stone-600 text-sm">Gegrilde lamskoteletten</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Filetto al pepe verde / tre formaggi</h3><span class="font-semibold text-amber-700">€ 34,50</span></div>
+                    <p class="text-stone-600 text-sm">Gegrilde ossenhaas met peper- of kaassaus</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Carne del giorno</h3><span class="font-semibold text-stone-500 italic">Dagprijs</span></div>
+                    <p class="text-stone-600 text-sm">Vleesgerecht van de dag</p>
+                </div>
+            </div>
+            <p class="text-xs text-stone-500 mt-4 italic">* Bovenstaande vis- en vleesgerechten worden geserveerd met gebakken aardappeltjes & salade.</p>
+        </section>
+
+        <!-- 6. Dolci & Gelati -->
+        <section id="dolci" class="scroll-mt-36">
+            <h2 class="text-2xl font-serif text-amber-700 border-b border-stone-300 pb-3 mb-6">Dolci & Gelati (Desserts)</h2>
+            <div class="space-y-6">
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Coppa Borgo Antico</h3><span class="font-semibold text-amber-700">€ 7,00</span></div>
+                    <p class="text-stone-600 text-sm">Diverse soorten ijs met slagroom</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Gelato tartufo</h3><span class="font-semibold text-amber-700">€ 7,75</span></div>
+                    <p class="text-stone-600 text-sm">IJsbonbon van bruine of witte chocolade met een kern van truffelchocolade</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Soufflé al cioccolato</h3><span class="font-semibold text-amber-700">€ 8,00</span></div>
+                    <p class="text-stone-600 text-sm">Chocoladesoufflé uit de oven</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Tiramisu</h3><span class="font-semibold text-amber-700">€ 8,00</span></div>
+                    <p class="text-stone-600 text-sm">Klassiek Italiaans nagerecht</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Gelato bambino</h3><span class="font-semibold text-amber-700">€ 5,00</span></div>
+                    <p class="text-stone-600 text-sm">Kinderijsje</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Dolce del giorno</h3><span class="font-semibold text-stone-500 italic">Dagprijs</span></div>
+                    <p class="text-stone-600 text-sm">Dessert van de dag</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-baseline"><h3 class="font-semibold text-lg">Formaggi misti</h3><span class="font-semibold text-stone-500 italic">Dagprijs</span></div>
+                    <p class="text-stone-600 text-sm">Selectie van Italiaanse kazen</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-stone-900 text-stone-400 py-12 px-6 border-t border-stone-800 text-center text-sm mt-20">
+        <p class="mb-2 text-white font-serif text-lg">Borgo Antico</p>
+        <p>Dorpsstraat 63, 2761 AA Zevenhuizen | 0180-632688 | info@borgoantico.nl</p>
+        <p class="mt-6 text-stone-600">&copy; 2026 Borgo Antico. Alle rechten voorbehouden.</p>
+    </footer>
+
+</body>
+</html>

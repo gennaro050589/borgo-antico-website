@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Over Ons – Borgo Antico Zevenhuizen</title>
+    <!-- Tailwind CSS voor strakke en snelle opmaak -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-stone-50 text-stone-800 font-sans">
+
+    <!-- Navigatiebalk (Sticky) -->
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-stone-200">
+        <div class="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="index.html" class="text-2xl font-serif tracking-wide text-stone-900">BORGO ANTICO</a>
+            <nav class="hidden md:flex gap-8 text-sm uppercase tracking-wider font-medium text-stone-600">
+                <a href="index.html" class="hover:text-stone-900 transition">Home</a>
+                <a href="menukaart.html" class="hover:text-stone-900 transition">Menukaart</a>
+                <a href="over-ons.html" class="text-stone-900 font-semibold">Over Ons</a>
+                <a href="contact.html" class="hover:text-stone-900 transition">Contact</a>
+            </nav>
+            <div class="flex items-center gap-3">
+                <a href="bestellen.html" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm">Bestellen</a>
+                <a href="contact.html" class="bg-stone-900 hover:bg-stone-800 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm">Reserveren</a>
+                <a href="account.html" class="bg-stone-800 hover:bg-stone-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm border border-amber-600/50">Inloggen</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Pagina Titel -->
+    <section class="bg-stone-900 text-white py-16 px-6 text-center">
+        <h1 class="text-4xl font-serif mb-3">Over Ons</h1>
+        <p class="text-stone-300 text-sm uppercase tracking-widest">De passie en het verhaal achter Borgo Antico</p>
+    </section>
+
+    <!-- Over Ons Inhoud -->
+    <main class="max-w-4xl mx-auto px-6 py-20 space-y-16">
+
+        <!-- Sectie 1: Het Verhaal & Filosofie + De Echte Foto -->
+        <section class="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+                <span class="text-amber-700 uppercase tracking-widest text-xs font-semibold block mb-2">Onze filosofie</span>
+                <h2 class="text-3xl font-serif mb-6 leading-tight">La Cucina Povera: puur en eerlijk</h2>
+                <p class="text-stone-600 leading-relaxed mb-4">
+                    De roots van de familie liggen in een klein vissersdorpje net buiten Napels. Hier zijn eten, drinken en samenzijn onlosmakelijk met elkaar verbonden. Het is de plek waar onze liefde voor de authentieke Italiaanse keuken is ontstaan.
+                </p>
+                <p class="text-stone-600 leading-relaxed">
+                    Onze kookstijl is gebaseerd op de filosofie van <em>La Cucina Povera</em>: het ten volste benutten van verse seizoensproducten en het maximaliseren van pure smaken. Geen onnodige poespas, maar koken met respect voor het ingrediënt en volgens traditioneel familierecept.
+                </p>
+            </div>
+            <!-- Hier plaatsen we de echte foto van het team in de keuken -->
+            <div>
+                <img src="keuken.jpg" alt="Het team in de keuken van Borgo Antico" class="rounded-2xl shadow-lg w-full object-cover h-[450px]">
+            </div>
+        </section>
+
+        <!-- Sectie 2: Wat u kunt verwachten -->
+        <section class="bg-white p-8 md:p-12 rounded-2xl border border-stone-200 shadow-sm text-center max-w-3xl mx-auto">
+            <h2 class="text-2xl font-serif mb-4">Welkom in het hart van Zevenhuizen</h2>
+            <p class="text-stone-600 leading-relaxed text-lg mb-6">
+                Wat begon met een grote droom, is uitgegroeid tot Borgo Antico. Wij geloven dat lekker eten niet ingewikkeld hoeft te zijn. Het geheime ingrediënt? Echte passie, vakmanschap en producten van de hoogste kwaliteit.
+            </p>
+            <p class="text-stone-600 leading-relaxed mb-8">
+                Of u nu gezellig langskomt met de familie voor een uitgebreid diner, geniet van een ambachtelijke pizza uit de oven of een klassieke pasta; bij ons stapt u heel even Italië binnen.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="menukaart.html" class="bg-stone-900 text-white font-medium px-6 py-3.5 rounded-xl hover:bg-stone-800 transition text-sm">Bekijk de menukaart</a>
+                <a href="contact.html" class="bg-amber-600 text-white font-medium px-6 py-3.5 rounded-xl hover:bg-amber-700 transition text-sm shadow-md">Reserveer een tafel</a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-stone-900 text-stone-400 py-12 px-6 border-t border-stone-800 text-center text-sm">
+        <p class="mb-2 text-white font-serif text-lg">Borgo Antico</p>
+        <p>Dorpsstraat 63, 2761 AA Zevenhuizen | 0180-632688 | info@borgoantico.nl</p>
+        <p class="mt-6 text-stone-600">&copy; 2026 Borgo Antico. Alle rechten voorbehouden.</p>
+    </footer>
+
+</body>
+</html>

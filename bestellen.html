@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Bestellen (Afhalen & Bezorgen) – Borgo Antico Zevenhuizen</title>
+    <!-- Tailwind CSS voor strakke en snelle opmaak -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-stone-50 text-stone-800 font-sans">
+
+    <!-- Melding als keuken gesloten is (Gekoppeld aan admin.html) -->
+    <div id="kitchenClosedBanner" class="hidden bg-red-600 text-white text-center py-3 px-4 font-semibold text-sm">
+        ⚠️ De keuken is momenteel gesloten voor online bestellingen. U kunt wel alvast een bestelling inplannen voor een latere dag!
+    </div>
+
+    <!-- Navigatiebalk (Sticky bovenaan de pagina) -->
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-stone-200">
+        <div class="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="index.html" class="text-2xl font-serif tracking-wide text-stone-900">BORGO ANTICO</a>
+            <nav class="hidden md:flex gap-8 text-sm uppercase tracking-wider font-medium text-stone-600">
+                <a href="index.html" class="hover:text-stone-900 transition">Home</a>
+                <a href="menukaart.html" class="hover:text-stone-900 transition">Menukaart</a>
+                <a href="over-ons.html" class="hover:text-stone-900 transition">Over Ons</a>
+                <a href="contact.html" class="hover:text-stone-900 transition">Contact</a>
+            </nav>
+            <div class="flex items-center gap-3">
+                <a href="bestellen.html" class="bg-amber-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium shadow-sm">Bestellen</a>
+                <a href="contact.html" class="bg-stone-900 hover:bg-stone-800 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm">Reserveren</a>
+                <a href="admin.html" id="accountNavBtn" class="bg-stone-800 hover:bg-stone-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm border border-amber-600/50">Inloggen</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Pagina Titel & Status Blok in Zwarte Balk -->
+    <section class="bg-stone-900 text-white py-12 px-6">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="text-center md:text-left">
+                <h1 class="text-4xl font-serif">Online Bestellen</h1>
+            </div>
+
+            <!-- Keuken Status Widget rechts in zwarte balk -->
+            <div id="frontKitchenBox" class="bg-stone-800 border border-stone-700 p-3.5 rounded-2xl shadow-lg flex items-center gap-3 text-left max-w-xs w-full">
+                <span id="frontKitchenDot" class="w-3 h-3 rounded-full bg-green-500 inline-block shrink-0"></span>
+                <div>
+                    <h4 id="frontKitchenTitle" class="font-semibold text-xs text-white">Open voor bezorgen & afhalen</h4>
+                    <p id="frontKitchenSub" class="text-[11px] text-stone-400">Bestel direct of plan voor later.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sticky Blok: Grote knoppen links, winkelmand rechts -->
+    <div class="sticky top-20 z-40 shadow-sm bg-white border-b border-stone-200">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+            
+            <!-- Knoppen Bezorgen / Afhalen -->
+            <div class="flex gap-3 w-full md:w-auto">
+                <button id="btnBezorgen" onclick="setOrderType('bezorgen')" class="flex-1 md:flex-initial px-6 py-3 rounded-xl font-semibold text-base transition border border-stone-300 bg-amber-600 text-white shadow-sm flex items-center justify-center gap-2">
+                    🚗 Bezorgen
+                </button>
+                <button id="btnAfhalen" onclick="setOrderType('afhalen')" class="flex-1 md:flex-initial px-6 py-3 rounded-xl font-semibold text-base transition border border-stone-300 bg-white text-stone-700 hover:bg-stone-100 flex items-center justify-center gap-2">
+                    🛍️ Afhalen
+                </button>
+            </div>
+
+            <!-- Winkelmand Knop -->
+            <div>
+                <button onclick="toggleCartModal()" class="bg-stone-900 hover:bg-stone-800 text-white px-5 py-3 rounded-xl font-semibold text-sm transition shadow-md flex items-center gap-3 border border-stone-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <span><span id="cartCount">0</span> items</span>
+                    <span class="text-stone-400">|</span>
+                    <span id="cartTotal" class="text-amber-400 font-bold">€ 0,00</span>
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Categorie Navigatie Balk -->
+        <nav class="bg-stone-100 border-t border-stone-200 py-3 px-6 overflow-x-auto">
+            <div id="categoryNavLinks" class="max-w-5xl mx-auto flex gap-8 text-sm font-medium uppercase tracking-wider whitespace-nowrap justify-start md:justify-center text-stone-600">
+                <!-- Dynamische categorie links -->
+            </div>
+        </nav>
+    </div>
+
+    <!-- Hoofdinhoud Menukaart -->
+    <main id="dynamicMenuContainer" class="max-w-4xl mx-auto px-6 py-12 space-y-16">
+        <!-- Dynamische gerechten per categorie -->
+    </main>
+
+    <!-- POP-UP / MODAL VOOR GERECHT TOEVOEGEN -->
+    <div id="itemModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl relative animate-in fade-in zoom-in duration-200">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-stone-400 hover:text-stone-700 w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center font-bold text-lg">&times;</button>
+            
+            <h3 id="modalItemName" class="text-2xl font-serif text-stone-900 mb-1">Gerecht</h3>
+            <p id="modalItemPrice" class="text-amber-700 font-serif font-bold text-lg mb-6">€ 0,00</p>
+
+            <div class="flex items-center justify-between mb-6 bg-stone-50 p-4 rounded-xl border border-stone-200">
+                <span class="font-medium text-stone-700 text-sm">Aantal</span>
+                <div class="flex items-center gap-4">
+                    <button onclick="changeQuantity(-1)" class="w-10 h-10 rounded-full bg-white border border-stone-300 text-stone-800 font-bold hover:bg-stone-100 shadow-sm flex items-center justify-center text-lg">-</button>
+                    <span id="modalQuantity" class="font-bold text-lg w-6 text-center">1</span>
+                    <button onclick="changeQuantity(1)" class="w-10 h-10 rounded-full bg-amber-600 text-white font-bold hover:bg-amber-700 shadow-sm flex items-center justify-center text-lg">+</button>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-2">Opmerking / Wensen voor de keuken</label>
+                <input type="text" id="modalNote" placeholder="Bijv. geen ui, extra warm..." class="w-full border border-stone-300 rounded-xl p-3 text-sm focus:outline-none focus:border-amber-600 bg-stone-50">
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="closeModal()" class="flex-1 bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold py-3.5 rounded-xl transition text-sm">Annuleren</button>
+                <button onclick="addToCartFromModal()" class="flex-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3.5 px-6 rounded-xl transition text-sm shadow-md">Toevoegen aan winkelwagen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- WINKELWAGEN & AFREKENEN OVERZICHT MODAL (2 STAPPEN) -->
+    <div id="cartModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-lg rounded-2xl p-6 shadow-2xl relative max-h-[90vh] flex flex-col">
+            <button onclick="toggleCartModal()" class="absolute top-4 right-4 text-stone-400 hover:text-stone-700 w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center font-bold text-lg">&times;</button>
+            
+            <!-- STAP 1: BESTELLING CHECK & GEWENSTE TIJD / DATUM -->
+            <div id="cartStepView" class="flex-1 overflow-y-auto pr-1">
+                
+                <!-- Bovenkant: Titel "Bestelling" links en netjes uitgelijnd Bezorgen/Afhalen label -->
+                <div class="flex items-center justify-between mb-4 pr-8">
+                    <h3 class="text-2xl font-serif text-stone-900">Bestelling</h3>
+                    <span id="modalOrderTypeBadge" class="bg-amber-100 text-amber-800 text-xs font-bold px-3.5 py-1.5 rounded-xl uppercase tracking-wider border border-amber-300">Bezorgen</span>
+                </div>
+                
+                <!-- Gewenste Datum & Tijd (gekoppeld aan admin openingstijden & stappen van 15 min) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-amber-50/50 p-3.5 rounded-xl border border-amber-200 mb-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-amber-900 mb-1">Gewenste Datum</label>
+                        <input type="date" id="custDate" onchange="populateTimeSlots()" required class="w-full border border-stone-300 rounded-xl p-2.5 text-sm focus:outline-none focus:border-amber-600 bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-amber-900 mb-1">Gewenste Tijd</label>
+                        <select id="custTime" required class="w-full border border-stone-300 rounded-xl p-2.5 text-sm focus:outline-none focus:border-amber-600 bg-white font-medium">
+                            <option value="Zo snel mogelijk">🚀 Zo snel mogelijk (ca. 30 min)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="cartItemsList" class="max-h-48 overflow-y-auto divide-y divide-stone-100 mb-4 space-y-3">
+                    <!-- Wordt dynamisch gevuld -->
+                </div>
+
+                <!-- KORTINGSCODE BALK -->
+                <div class="bg-stone-50 p-4 rounded-xl border border-stone-200 mb-4">
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-2">Heb je een kortingscode?</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="discountInput" placeholder="Bijv. MAANDAG10" class="flex-1 border border-stone-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-600 bg-white uppercase font-mono font-bold">
+                        <button onclick="applyDiscount()" class="bg-stone-900 hover:bg-stone-800 text-white px-4 py-2 rounded-xl text-sm font-semibold transition">Toepassen</button>
+                    </div>
+                    <p id="discountMessage" class="text-xs mt-2 font-medium"></p>
+                </div>
+
+                <div class="border-t border-stone-200 pt-4 mb-6">
+                    <div class="flex justify-between font-serif font-bold text-xl text-stone-900">
+                        <span>Totaal:</span>
+                        <span id="cartModalTotal">€ 0,00</span>
+                    </div>
+                </div>
+
+                <div class="flex gap-3">
+                    <button onclick="toggleCartModal()" class="flex-1 bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold py-3 rounded-xl transition text-sm">Verder winkelen</button>
+                    <button onclick="goToCheckout()" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3 rounded-xl transition text-sm shadow-md">Naar afrekenen</button>
+                </div>
+            </div>
+
+            <!-- STAP 2: GEGEVENS & AFREKENEN FORMULIER -->
+            <div id="checkoutStepView" class="hidden flex-1 overflow-y-auto pr-1">
+                <h3 class="text-2xl font-serif text-stone-900 mb-4">Gegevens & Afrekenen</h3>
+                
+                <form id="checkoutForm" onsubmit="submitOrder(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Naam</label>
+                        <input type="text" id="custName" required placeholder="Uw volledige naam" class="w-full border border-stone-300 rounded-xl p-3 text-sm focus:outline-none focus:border-amber-600 bg-stone-50">
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">E-mailadres</label>
+                            <input type="email" id="custEmail" required placeholder="naam@voorbeeld.nl" class="w-full border border-stone-300 rounded-xl p-3 text-sm focus:outline-none focus:border-amber-600 bg-stone-50">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Telefoonnummer</label>
+                            <input type="tel" id="custPhone" required placeholder="06-12345678" class="w-full border border-stone-300 rounded-xl p-3 text-sm focus:outline-none focus:border-amber-600 bg-stone-50">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Straat en huisnummer</label>
+                        <input type="text" id="custStreet" required placeholder="Dorpsstraat 1" class="w-full border border-stone-300 rounded-xl p-3 text-sm focus:outline-none focus:border-amber-600 bg-stone-50">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Postcode</label>
+                            <input type="text" id="custZip" required placeholder="2761 AA" class="w-full border border-stone-300 rounded-xl p-3 text-sm focus:outline-none focus:border-amber-600 bg-stone-50">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Woonplaats</label>
+                            <input type="text" id="custCity" required value="Zevenhuizen" class="w-full border border-stone-300 rounded-xl p-3 text-sm focus:outline-none focus:border-amber-600 bg-stone-50">
+                        </div>
+                    </div>
+
+                    <!-- Melding bij ongeldig of uitgeschakeld bezorggebied -->
+                    <div id="deliveryErrorBox" class="hidden bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl text-xs font-semibold">
+                        ⚠️ Vandaag bezorgen wij niet in dit gebied of is dit gebied uitgeschakeld. U kunt wel kiezen voor afhalen!
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Betaalwijze</label>
+                        <select id="custPayment" class="w-full border border-stone-300 rounded-xl p-3 text-sm focus:outline-none focus:border-amber-600 bg-stone-50 font-medium">
+                            <option value="Tikkie">Betaal via Tikkie (wij sturen een betaalverzoek)</option>
+                            <option value="Contant">Contant bij afhalen / bezorgen</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Opmerking voor de bezorger (optioneel)</label>
+                        <input type="text" id="custDriverNote" placeholder="Bijv. bel doet het niet, kloppen graag..." class="w-full border border-stone-300 rounded-xl p-3 text-sm focus:outline-none focus:border-amber-600 bg-stone-50">
+                    </div>
+
+                    <!-- Vinkjes: Onthoud mijn gegevens & Algemene voorwaarden -->
+                    <div class="space-y-2 pt-2 border-t border-stone-200">
+                        <label class="flex items-center gap-2 text-xs font-medium text-stone-700 cursor-pointer">
+                            <input type="checkbox" id="rememberMeCheck" class="rounded border-stone-300 text-amber-600 focus:ring-amber-500 w-4 h-4">
+                            <span>Onthoud mijn gegevens voor een volgende keer</span>
+                        </label>
+                        <label class="flex items-center gap-2 text-xs font-medium text-stone-700 cursor-pointer">
+                            <input type="checkbox" id="termsCheck" required class="rounded border-stone-300 text-amber-600 focus:ring-amber-500 w-4 h-4">
+                            <span>Ik ga akkoord met de <a href="#" class="text-amber-700 underline">algemene voorwaarden</a></span>
+                        </label>
+                    </div>
+
+                    <div class="border-t border-stone-200 pt-4 flex gap-3 mt-6">
+                        <button type="button" onclick="backToCart()" class="flex-1 bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold py-3 rounded-xl transition text-sm">Terug</button>
+                        <button type="submit" id="submitOrderBtn" class="flex-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3 px-6 rounded-xl transition text-sm shadow-md">Bestelling plaatsen</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGICA -->
+    <script>
+        let currentItem = { name: '', price: 1, quantity: 1, note: '' };
+        let cart = [];
+        let orderType = 'bezorgen';
+        let activeDiscount = null;
+
+        let defaultCategories = ["Voorgerechten", "Pizza's", "Dessert", "Drinken", "Alcohol"];
+        let defaultMenuItems = [
+            { id: 1, name: 'Carpaccio', ingredients: 'Klassieke rundercarpaccio met rucola en parmezaanse kaas', category: 'Voorgerechten', price: 15.00, soldOut: false },
+            { id: 2, name: 'Vitello', ingredients: 'Malse kalfsmuis met traditionele tonijnmayonaise', category: 'Voorgerechten', price: 15.00, soldOut: false },
+            { id: 3, name: 'Focaccia', ingredients: 'Versgebakken Italiaans brood met rozemarijn en zeezout', category: 'Voorgerechten', price: 9.50, soldOut: false },
+            { id: 4, name: 'Pizza Margherita', ingredients: 'Tomatensaus, mozzarella fior di latte', category: "Pizza's", price: 11.50, soldOut: false },
+            { id: 5, name: 'Tiramisu', ingredients: 'Huisgemaakte Italiaanse klassieker met espresso en mascarpone', category: 'Dessert', price: 8.00, soldOut: false }
+        ];
+
+        let defaultDiscounts = [
+            { id: 1, name: '10% Korting (Maandag)', code: 'MAANDAG10', type: 'percentage', value: '10' },
+            { id: 2, name: 'Gratis Tiramisu', code: 'TIRAMISU1', type: 'gratis_item', value: 'tiramisu' }
+        ];
+
+        let defaultDeliveryAreas = [
+            { id: 1, name: 'Zevenhuizen', zips: '2761', active: true },
+            { id: 2, name: 'Moerkapelle', zips: '2751', active: true }
+        ];
+
+        let defaultOpeningHours = [
+            { day: 'Maandag', open: false, openTime: '16:00', closeTime: '21:30' },
+            { day: 'Dinsdag', open: true, openTime: '16:00', closeTime: '21:30' },
+            { day: 'Woensdag', open: true, openTime: '16:00', closeTime: '21:30' },
+            { day: 'Donderdag', open: true, openTime: '16:00', closeTime: '21:30' },
+            { day: 'Vrijdag', open: true, openTime: '16:00', closeTime: '22:00' },
+            { day: 'Zaterdag', open: true, openTime: '16:00', closeTime: '22:00' },
+            { day: 'Zondag', open: true, openTime: '16:00', closeTime: '21:30' }
+        ];
+
+        document.addEventListener("DOMContentLoaded", function() {
+            // Vul datum automatisch in op vandaag
+            let now = new Date();
+            let dateStr = now.toISOString().split('T')[0];
+            let dateInput = document.getElementById('custDate');
+            if (dateInput) dateInput.value = dateStr;
+
+            // Vul de tijdstappen aan op basis van admin openingstijden
+            populateTimeSlots();
+
+            let savedUser = localStorage.getItem('borgo_user');
+            if (savedUser) {
+                let user = JSON.parse(savedUser);
+                let navBtn = document.getElementById('accountNavBtn');
+                if(navBtn) navBtn.innerText = user.name.split(' ')[0];
+
+                document.getElementById('custName').value = user.name || '';
+                document.getElementById('custEmail').value = user.email || '';
+                document.getElementById('custPhone').value = user.phone || '';
+                document.getElementById('custStreet').value = user.street || '';
+                document.getElementById('custZip').value = user.zip || '';
+                document.getElementById('custCity').value = user.city || 'Zevenhuizen';
+                let remCheck = document.getElementById('rememberMeCheck');
+                if(remCheck) remCheck.checked = true;
+            }
+
+            checkAndSyncKitchenStatus();
+            renderDynamicMenu();
+        });
+
+        // --- DYNAMISCHE TIJDEN OP BASIS VAN ADMIN OPENINGSTIJDEN ---
+        function populateTimeSlots() {
+            let timeSelect = document.getElementById('custTime');
+            if (!timeSelect) return;
+
+            let dateInput = document.getElementById('custDate');
+            let selectedDate = dateInput && dateInput.value ? new Date(dateInput.value) : new Date();
+            let dayNames = ['Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag'];
+            let dayName = dayNames[selectedDate.getDay()];
+
+            // Haal openingstijden uit localStorage (ingesteld in admin.html)
+            let openingHours = JSON.parse(localStorage.getItem('borgo_opening_hours')) || defaultOpeningHours;
+            let daySchedule = openingHours.find(h => h.day === dayName);
+
+            let html = '<option value="Zo snel mogelijk">🚀 Zo snel mogelijk (ca. 30 min)</option>';
+
+            if (!daySchedule || !daySchedule.open) {
+                html += '<option value="" disabled>Geen openingstijden op deze dag</option>';
+                timeSelect.innerHTML = html;
+                return;
+            }
+
+            // Bepaal openingstijd en sluitingstijd van die dag (bijv. "16:00" en "21:30")
+            let [openH, openM] = daySchedule.openTime.split(':').map(Number);
+            let [closeH, closeM] = daySchedule.closeTime.split(':').map(Number);
+
+            // Als het vandaag is, zorgen we dat de tijd minimaal 30 min in de toekomst ligt
+            let now = new Date();
+            let isToday = selectedDate.toDateString() === now.toDateString();
+            
+            let minHour = openH;
+            let minMinute = openM;
+
+            if (isToday) {
+                now.setMinutes(now.getMinutes() + 30);
+                let curH = now.getHours();
+                let curM = now.getMinutes();
+
+                if (curH > openH || (curH === openH && curM > openM)) {
+                    minHour = curH;
+                    minMinute = curM;
+                    // Afronden op dichtstbijzijnde kwartier
+                    let rem = minMinute % 15;
+                    if (rem !== 0) {
+                        minMinute += (15 - rem);
+                        if (minMinute >= 60) {
+                            minMinute = 0;
+                            minHour += 1;
+                        }
+                    }
+                }
+            }
+
+            // Bouw de opties per kwartier
+            let startMinutes = minHour * 60 + minMinute;
+            let endMinutes = closeH * 60 + closeM;
+
+            for (let totalM = startMinutes; totalM <= endMinutes; totalM += 15) {
+                let h = Math.floor(totalM / 60);
+                let m = totalM % 60;
+                let timeFormatted = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+                html += `<option value="${timeFormatted}">${timeFormatted} uur</option>`;
+            }
+
+            timeSelect.innerHTML = html;
+        }
+
+        // --- SLIMME KEUKENSTATUS KOPPELING MET ADMIN.HTML ---
+        function checkAndSyncKitchenStatus() {
+            let now = new Date();
+            let manualOverride = localStorage.getItem('borgo_manual_override'); // 'closed' of 'open'
+            let expiryTime = parseInt(localStorage.getItem('borgo_override_expiry') || '0', 10);
+
+            if (manualOverride && now.getTime() >= expiryTime) {
+                localStorage.removeItem('borgo_manual_override');
+                localStorage.removeItem('borgo_override_expiry');
+                manualOverride = null;
+            }
+
+            let isOpen = false;
+            if (manualOverride === 'closed') {
+                isOpen = false;
+            } else if (manualOverride === 'open') {
+                isOpen = true;
+            } else {
+                let openingHours = JSON.parse(localStorage.getItem('borgo_opening_hours')) || defaultOpeningHours;
+                let dayNames = ['Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag'];
+                let dayName = dayNames[now.getDay()];
+                let daySchedule = openingHours.find(h => h.day === dayName);
+
+                if (daySchedule && daySchedule.open) {
+                    let currentTimeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+                    if (currentTimeStr >= daySchedule.openTime && currentTimeStr <= daySchedule.closeTime) {
+                        isOpen = true;
+                    }
+                }
+            }
+
+            let banner = document.getElementById('kitchenClosedBanner');
+            let dot = document.getElementById('frontKitchenDot');
+            let title = document.getElementById('frontKitchenTitle');
+            let sub = document.getElementById('frontKitchenSub');
+
+            if (isOpen) {
+                banner.classList.add('hidden');
+                localStorage.setItem('borgo_kitchen_open', 'true');
+                if (dot) dot.className = "w-3 h-3 rounded-full bg-green-500 inline-block shrink-0 animate-pulse";
+                if (title) title.innerText = "Open voor bezorgen & afhalen";
+                if (sub) sub.innerText = "Bestel direct of plan voor later.";
+            } else {
+                banner.classList.remove('hidden');
+                localStorage.setItem('borgo_kitchen_open', 'false');
+                if (dot) dot.className = "w-3 h-3 rounded-full bg-red-500 inline-block shrink-0";
+                if (title) title.innerText = "Gesloten (Buiten openingstijden)";
+                if (sub) sub.innerText = "Plan gerust in voor een latere dag!";
+            }
+        }
+
+        function renderDynamicMenu() {
+            let categories = JSON.parse(localStorage.getItem('borgo_categories')) || defaultCategories;
+            let menuItems = JSON.parse(localStorage.getItem('borgo_menu_items')) || defaultMenuItems;
+
+            let navHtml = '';
+            categories.forEach(cat => {
+                let catId = cat.toLowerCase().replace(/[^a-z0-9]/g, '');
+                navHtml += `<a href="#${catId}" class="hover:text-amber-700 transition">${cat}</a>`;
+            });
+            document.getElementById('categoryNavLinks').innerHTML = navHtml;
+
+            let menuContainerHtml = '';
+            categories.forEach(cat => {
+                let catId = cat.toLowerCase().replace(/[^a-z0-9]/g, '');
+                let itemsInCat = menuItems.filter(item => item.category === cat);
+
+                if (itemsInCat.length > 0) {
+                    menuContainerHtml += `
+                        <section id="${catId}" class="scroll-mt-48">
+                            <h2 class="text-2xl font-serif text-amber-700 border-b border-stone-200 pb-3 mb-6">${cat}</h2>
+                            <div class="grid gap-6">
+                    `;
+
+                    itemsInCat.forEach(item => {
+                        let isSoldOut = item.soldOut;
+                        let cardClass = isSoldOut ? "bg-stone-100 opacity-60 p-6 rounded-xl border border-stone-200 flex justify-between items-center" : "bg-white p-6 rounded-xl border border-stone-200 shadow-sm hover:border-amber-600 hover:shadow-md cursor-pointer transition flex justify-between items-center";
+                        let clickAction = isSoldOut ? "" : `onclick="openModal('${item.name.replace(/'/g, "\\'")}', ${item.price})"`;
+
+                        menuContainerHtml += `
+                            <div ${clickAction} class="${cardClass}">
+                                <div>
+                                    <h3 class="font-semibold text-lg text-stone-900 flex items-center gap-3">
+                                        ${item.name}
+                                        ${isSoldOut ? '<span class="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded font-bold uppercase tracking-wider">Uitverkocht</span>' : ''}
+                                    </h3>
+                                    <p class="text-stone-500 text-sm mt-1">${item.ingredients || ''}</p>
+                                </div>
+                                <span class="font-serif font-bold text-amber-700 text-lg">€ ${item.price.toFixed(2).replace('.', ',')}</span>
+                            </div>
+                        `;
+                    });
+
+                    menuContainerHtml += `
+                            </div>
+                        </section>
+                    `;
+                }
+            });
+
+            document.getElementById('dynamicMenuContainer').innerHTML = menuContainerHtml || '<p class="text-center text-stone-500 py-12">Nog geen gerechten beschikbaar.</p>';
+        }
+
+        function setOrderType(type) {
+            orderType = type;
+            const btnBezorgen = document.getElementById('btnBezorgen');
+            const btnAfhalen = document.getElementById('btnAfhalen');
+            const badge = document.getElementById('modalOrderTypeBadge');
+
+            if (type === 'bezorgen') {
+                btnBezorgen.className = "flex-1 md:flex-initial px-6 py-3 rounded-xl font-semibold text-base transition border border-stone-300 bg-amber-600 text-white shadow-sm flex items-center justify-center gap-2";
+                btnAfhalen.className = "flex-1 md:flex-initial px-6 py-3 rounded-xl font-semibold text-base transition border border-stone-300 bg-white text-stone-700 hover:bg-stone-100 flex items-center justify-center gap-2";
+                if(badge) {
+                    badge.innerText = "Bezorgen";
+                    badge.className = "bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1.5 rounded-xl uppercase tracking-wider border border-amber-300";
+                }
+            } else {
+                btnAfhalen.className = "flex-1 md:flex-initial px-6 py-3 rounded-xl font-semibold text-base transition border border-stone-300 bg-amber-600 text-white shadow-sm flex items-center justify-center gap-2";
+                btnBezorgen.className = "flex-1 md:flex-initial px-6 py-3 rounded-xl font-semibold text-base transition border border-stone-300 bg-white text-stone-700 hover:bg-stone-100 flex items-center justify-center gap-2";
+                if(badge) {
+                    badge.innerText = "Afhalen";
+                    badge.className = "bg-stone-200 text-stone-800 text-xs font-bold px-3 py-1.5 rounded-xl uppercase tracking-wider border border-stone-300";
+                }
+            }
+        }
+
+        function openModal(name, price) {
+            currentItem = { name: name, price: price, quantity: 1, note: '' };
+            document.getElementById('modalItemName').innerText = name;
+            document.getElementById('modalItemPrice').innerText = '€ ' + price.toFixed(2).replace('.', ',');
+            document.getElementById('modalQuantity').innerText = '1';
+            document.getElementById('modalNote').value = '';
+            document.getElementById('itemModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('itemModal').classList.add('hidden');
+        }
+
+        function changeQuantity(amount) {
+            currentItem.quantity += amount;
+            if (currentItem.quantity < 1) currentItem.quantity = 1;
+            document.getElementById('modalQuantity').innerText = currentItem.quantity;
+        }
+
+        function addToCartFromModal() {
+            currentItem.note = document.getElementById('modalNote').value;
+            cart.push({ ...currentItem });
+            updateCartUI();
+            closeModal();
+        }
+
+        function updateCartUI() {
+            let totalCount = 0;
+            let totalPrice = 0;
+            let listHTML = '';
+
+            cart.forEach((item, index) => {
+                totalCount += item.quantity;
+                let itemTotal = item.price * item.quantity;
+                totalPrice += itemTotal;
+
+                listHTML += `
+                    <div class="flex justify-between items-center py-2">
+                        <div>
+                            <p class="font-semibold text-stone-900">${item.quantity}x ${item.name}</p>
+                            ${item.note ? `<p class="text-xs text-stone-500 italic">Opmerking: ${item.note}</p>` : ''}
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <span class="font-serif font-bold text-amber-700">€ ${itemTotal.toFixed(2).replace('.', ',')}</span>
+                            <button onclick="removeFromCart(${index})" class="text-stone-400 hover:text-red-600 text-sm font-bold">&times;</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            if (activeDiscount) {
+                let discounts = JSON.parse(localStorage.getItem('borgo_discounts')) || defaultDiscounts;
+                let found = discounts.find(d => d.code === activeDiscount);
+                if (found && found.type === 'percentage') {
+                    let perc = parseFloat(found.value) || 0;
+                    let discountAmount = totalPrice * (perc / 100);
+                    totalPrice -= discountAmount;
+                    listHTML += `
+                        <div class="flex justify-between items-center py-2 text-green-700 bg-green-50 px-2 rounded">
+                            <p class="font-semibold text-sm">${found.name} (${perc}%)</p>
+                            <span class="font-serif font-bold">- € ${discountAmount.toFixed(2).replace('.', ',')}</span>
+                        </div>
+                    `;
+                }
+            }
+
+            document.getElementById('cartCount').innerText = totalCount;
+            document.getElementById('cartTotal').innerText = '€ ' + totalPrice.toFixed(2).replace('.', ',');
+            document.getElementById('cartModalTotal').innerText = '€ ' + totalPrice.toFixed(2).replace('.', ',');
+            document.getElementById('cartItemsList').innerHTML = listHTML || '<p class="text-stone-500 text-center py-6">Je winkelmand is nog leeg.</p>';
+        }
+
+        function applyDiscount() {
+            let inputCode = document.getElementById('discountInput').value.trim().toUpperCase();
+            let msg = document.getElementById('discountMessage');
+            let discounts = JSON.parse(localStorage.getItem('borgo_discounts')) || defaultDiscounts;
+
+            let foundDiscount = discounts.find(d => d.code === inputCode);
+
+            if (foundDiscount) {
+                activeDiscount = foundDiscount.code;
+                msg.className = "text-xs mt-2 font-medium text-green-600";
+                msg.innerText = `✓ Actie "${foundDiscount.name}" succesvol toegepast!`;
+                updateCartUI();
+            } else {
+                activeDiscount = null;
+                msg.className = "text-xs mt-2 font-medium text-red-600";
+                msg.innerText = "✕ Ongeldige of inactieve kortingscode.";
+                updateCartUI();
+            }
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        function toggleCartModal() {
+            const modal = document.getElementById('cartModal');
+            modal.classList.toggle('hidden');
+            setOrderType(orderType);
+            populateTimeSlots();
+            backToCart(); 
+        }
+
+        function goToCheckout() {
+            if (cart.length === 0) {
+                alert('Uw winkelmand is leeg!');
+                return;
+            }
+            document.getElementById('cartStepView').classList.add('hidden');
+            document.getElementById('checkoutStepView').classList.remove('hidden');
+        }
+
+        function backToCart() {
+            document.getElementById('checkoutStepView').classList.add('hidden');
+            document.getElementById('cartStepView').classList.remove('hidden');
+        }
+
+        // --- BESTELLING INDIENEN & E-MAIL VERSTUREN ---
+        async function submitOrder(event) {
+            event.preventDefault();
+            
+            let zipInput = document.getElementById('custZip').value.trim().replace(/\s+/g, '').toUpperCase();
+            let errorBox = document.getElementById('deliveryErrorBox');
+
+            if (orderType === 'bezorgen') {
+                let areas = JSON.parse(localStorage.getItem('borgo_delivery_areas')) || defaultDeliveryAreas;
+                let allowed = false;
+
+                areas.forEach(area => {
+                    if (area.active) {
+                        let validZips = area.zips.split(',').map(z => z.trim().toUpperCase());
+                        validZips.forEach(z => {
+                            if (zipInput.startsWith(z)) {
+                                allowed = true;
+                            }
+                        });
+                    }
+                });
+
+                if (!allowed) {
+                    errorBox.classList.remove('hidden');
+                    return;
+                } else {
+                    errorBox.classList.add('hidden');
+                }
+            }
+
+            let customer = {
+                type: orderType,
+                date: document.getElementById('custDate').value,
+                time: document.getElementById('custTime').value,
+                name: document.getElementById('custName').value,
+                email: document.getElementById('custEmail').value,
+                phone: document.getElementById('custPhone').value,
+                street: document.getElementById('custStreet').value,
+                zip: document.getElementById('custZip').value,
+                city: document.getElementById('custCity').value,
+                payment: document.getElementById('custPayment').value,
+                driverNote: document.getElementById('custDriverNote').value,
+                discountUsed: activeDiscount ? activeDiscount : 'geen'
+            };
+
+            let rememberMe = document.getElementById('rememberMeCheck').checked;
+            if (rememberMe) {
+                localStorage.setItem('borgo_user', JSON.stringify(customer));
+            } else {
+                localStorage.removeItem('borgo_user');
+            }
+
+            // Sla de bestelling op in localStorage zodat het live keukenscherm hem direct ontvangt
+            let newOrderForDashboard = {
+                id: "ORD-" + Math.floor(1000 + Math.random() * 9000),
+                orderTime: new Date(),
+                deliveryDate: new Date(customer.date + 'T' + (customer.time === 'Zo snel mogelijk' ? '12:00:00' : customer.time)),
+                customer: customer.name,
+                email: customer.email,
+                type: customer.type === 'bezorgen' ? 'Bezorgen' : 'Afhalen',
+                address: customer.street + ', ' + customer.city,
+                phone: customer.phone,
+                items: cart.map(item => ({ qty: item.quantity, name: item.name, note: item.note })),
+                total: document.getElementById('cartModalTotal').innerText,
+                payment: customer.payment,
+                prepTime: 30, 
+                status: 'nieuw', 
+                expanded: false,
+                isNew: true
+            };
+
+            let existingOrders = JSON.parse(localStorage.getItem('borgo_orders')) || [];
+            existingOrders.unshift(newOrderForDashboard);
+            localStorage.setItem('borgo_orders', JSON.stringify(existingOrders));
+
+            // Stuur de bestelling door naar onze Netlify e-mailfunctie
+            try {
+                let response = await fetch('/.netlify/functions/send-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ customer: customer, cart: cart })
+                });
+
+                if (!response.ok) {
+                    console.error('Fout bij verzenden e-mail via server');
+                }
+            } catch (err) {
+                console.error('Netwerkfout bij e-mailfunctie:', err);
+            }
+
+            alert('Bedankt voor uw bestelling, ' + customer.name + '! (' + customer.type + ') Gewenst: ' + customer.date + ' om ' + customer.time + '. Betaalwijze: ' + customer.payment);
+            toggleCartModal();
+            cart = [];
+            activeDiscount = null;
+            updateCartUI();
+        }
+    </script>
+
+    <!-- Footer -->
+    <footer class="bg-stone-900 text-stone-400 py-12 px-6 border-t border-stone-800 text-center text-sm mt-20">
+        <p class="mb-2 text-white font-serif text-lg">Borgo Antico</p>
+        <p>Dorpsstraat 63, 2761 AA Zevenhuizen | 0180-632688 | info@borgoantico.nl</p>
+        <p class="mt-6 text-stone-600">&copy; 2026 Borgo Antico. Alle rechten voorbehouden.</p>
+    </footer>
+
+</body>
+</html>

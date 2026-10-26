@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Borgo Antico - Keuken Live Dashboard</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.99); opacity: 1; }
+            50% { transform: scale(1.01); opacity: 0.7; }
+            100% { transform: scale(0.99); opacity: 1; }
+        }
+        .animate-alarm { animation: pulse-ring 1.2s infinite; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
+
+    <!-- ========================================== -->
+    <!-- HOOFDSTUK 1: INLOG & AUTHENTICATIE         -->
+    <!-- ========================================== -->
+    <div id="login-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center">
+        <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl shadow-2xl w-full max-w-md text-center">
+            <div class="w-16 h-16 bg-amber-500/10 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+                🍕
+            </div>
+            <h2 class="text-2xl font-bold mb-2">Borgo Antico Keuken</h2>
+            <p class="text-slate-400 text-sm mb-6">Voer de keukencode in om het live dashboard te openen.</p>
+            <form onsubmit="handleLogin(event)" class="space-y-4">
+                <input type="password" id="pin-input" placeholder="Pincode (bijv. 1234)" maxlength="6" class="w-full bg-slate-950 border border-slate-800 text-center text-2xl tracking-widest py-3 rounded-xl focus:outline-none focus:border-amber-500 text-white" required>
+                <button type="submit" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-semibold py-3 rounded-xl transition">Inloggen</button>
+            </form>
+            <p id="login-error" class="text-rose-500 text-xs mt-3 hidden">Onjuiste code, probeer het opnieuw.</p>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- HOOFDSTUK 2: HOOFDSTRUCTUUR & INTERFACE    -->
+    <!-- ========================================== -->
+    <div id="app-container" class="hidden flex-1 flex flex-col">
+        
+        <!-- Header -->
+        <header class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div>
+                    <h1 class="font-bold text-lg leading-none">Borgo Antico Keukenscherm</h1>
+                    <span class="text-xs text-emerald-400 flex items-center mt-1">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block mr-1.5 animate-pulse"></span>
+                        Live verbonden met onlinebestellen
+                    </span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="text-right">
+                    <div id="live-clock" class="text-lg font-mono font-bold text-amber-400">00:00:00</div>
+                    <div class="text-xs text-slate-400">Keuken Tablet #1</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigatiebalk (Tabbladen) -->
+        <nav class="bg-slate-900/60 border-b border-slate-800 px-6 py-3">
+            <div class="max-w-6xl mx-auto flex flex-wrap gap-2">
+                <button onclick="switchTab('bestellingen')" id="tab-bestellingen" class="px-4 py-2 rounded-xl text-sm font-semibold transition bg-amber-600 text-white shadow-lg shadow-amber-900/20">
+                    Bestellingen <span id="count-bestellingen" class="ml-2 bg-slate-900 px-2 py-0.5 rounded-full text-xs">0</span>
+                </button>
+                <button onclick="switchTab('gepland')" id="tab-gepland" class="px-4 py-2 rounded-xl text-sm font-semibold transition bg-slate-800 text-slate-300 hover:bg-slate-700">
+                    Gepland (Vandaag) <span id="count-gepland" class="ml-2 bg-slate-900 px-2 py-0.5 rounded-full text-xs">0</span>
+                </button>
+                <button onclick="switchTab('vooruitbesteld')" id="tab-vooruitbesteld" class="px-4 py-2 rounded-xl text-sm font-semibold transition bg-slate-800 text-slate-300 hover:bg-slate-700">
+                    Vooruitbesteld (Toekomst) <span id="count-vooruitbesteld" class="ml-2 bg-slate-900 px-2 py-0.5 rounded-full text-xs">0</span>
+                </button>
+                <button onclick="switchTab('afgerond')" id="tab-afgerond" class="px-4 py-2 rounded-xl text-sm font-semibold transition bg-slate-800 text-slate-300 hover:bg-slate-700">
+                    Afgerond <span id="count-afgerond" class="ml-2 bg-slate-900 px-2 py-0.5 rounded-full text-xs">0</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Dashboard Lijst -->
+        <main class="flex-1 p-6 max-w-6xl mx-auto w-full space-y-4" id="orders-list">
+            <!-- Dynamische bestellingen komen hier -->
+        </main>
+
+    </div>
+
+    <audio id="alarm-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
+
+    <script>
+        // ==========================================
+        // HOOFDSTUK 3: CONFIGURATIE & DATA
+        // ==========================================
+        const CORRECT_PIN = "1234";
+        let activeTab = 'bestellingen';
+
+        // Laad echte bestellingen vanuit de browser-opslag (localStorage), of begin met een lege lijst als er geen bestellingen zijn
+        let orders = JSON.parse(localStorage.getItem('borgo_orders')) || [];        
+
+        // ==========================================
+        // HOOFDSTUK 4: DASHBOARD & TIJDLOGICA
+        // ==========================================
+        function handleLogin(e) {
+            e.preventDefault();
+            const pin = document.getElementById('pin-input').value;
+            if(pin === CORRECT_PIN) {
+                document.getElementById('login-modal').classList.add('hidden');
+                document.getElementById('app-container').classList.remove('hidden');
+                startClock();
+                renderOrders();
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        }
+
+        function startClock() {
+            setInterval(() => {
+                const now = new Date();
+                document.getElementById('live-clock').innerText = now.toLocaleTimeString('nl-NL');
+                renderOrders();
+            }, 1000);
+        }
+
+        function switchTab(tab) {
+            activeTab = tab;
+            ['bestellingen', 'gepland', 'vooruitbesteld', 'afgerond'].forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                if(t === tab) {
+                    btn.className = "px-4 py-2 rounded-xl text-sm font-semibold transition bg-amber-600 text-white shadow-lg shadow-amber-900/20";
+                } else {
+                    btn.className = "px-4 py-2 rounded-xl text-sm font-semibold transition bg-slate-800 text-slate-300 hover:bg-slate-700";
+                }
+            });
+            renderOrders();
+        }
+
+        function isToday(date) {
+            const today = new Date();
+            return date.getDate() === today.getDate() &&
+                   date.getMonth() === today.getMonth() &&
+                   date.getFullYear() === today.getFullYear();
+        }
+
+        function calculateExpectedTime(orderTime, prepMinutes) {
+            return new Date(orderTime.getTime() + prepMinutes * 60000);
+        }
+
+        function formatTime(dateObj) {
+            return dateObj.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function formatDate(dateObj) {
+            return dateObj.toLocaleDateString('nl-NL', { weekday: 'short', day: 'numeric', month: 'numeric' });
+        }
+
+        // ==========================================
+        // HOOFDSTUK 5: RENDEREN & INTERACTIONELEN
+        // ==========================================
+        function renderOrders() {
+            const now = new Date();
+
+            let bestellingenCount = 0;
+            let geplandCount = 0;
+            let vooruitbesteldCount = 0;
+            let afgerondCount = 0;
+
+            const processedOrders = orders.map(order => {
+                const expDate = calculateExpectedTime(order.orderTime, order.prepTime);
+                const diffMs = expDate - now;
+                const diffMins = diffMs / 60000;
+
+                let category = 'bestellingen';
+
+                if (order.status === 'afgerond') {
+                    category = 'afgerond';
+                    afgerondCount++;
+                } else if (!isToday(order.deliveryDate)) {
+                    category = 'vooruitbesteld';
+                    vooruitbesteldCount++;
+                } else if (diffMins > 60) {
+                    category = 'gepland';
+                    geplandCount++;
+                } else {
+                    category = 'bestellingen';
+                    bestellingenCount++;
+                }
+                return { ...order, expDate, category };
+            });
+
+            document.getElementById('count-bestellingen').innerText = bestellingenCount;
+            document.getElementById('count-gepland').innerText = geplandCount;
+            document.getElementById('count-vooruitbesteld').innerText = vooruitbesteldCount;
+            document.getElementById('count-afgerond').innerText = afgerondCount;
+
+            let filtered = processedOrders.filter(o => o.category === activeTab);
+            filtered.sort((a, b) => a.expDate - b.expDate);
+
+            const list = document.getElementById('orders-list');
+            list.innerHTML = '';
+
+            if(filtered.length === 0) {
+                list.innerHTML = `
+                    <div class="py-20 text-center text-slate-500">
+                        <p class="text-4xl mb-2">📂</p>
+                        <p class="text-lg">Geen bestellingen in deze categorie.</p>
+                        <p class="text-xs mt-1">Bestellingen worden automatisch op datum en tijd ingedeeld.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(order => {
+                const card = document.createElement('div');
+                const isUrgentNew = order.status === 'nieuw' && activeTab === 'bestellingen';
+                const expectedTimeStr = formatTime(order.expDate);
+                const orderTimeStr = formatTime(order.orderTime);
+                const deliveryDateStr = formatDate(order.deliveryDate);
+
+                card.className = `bg-slate-900 border ${isUrgentNew ? 'border-amber-500 animate-alarm' : 'border-slate-800'} rounded-2xl shadow-xl overflow-hidden transition-all`;
+                
+                let itemsHtml = order.items.map(item => `
+                    <li class="py-2 border-b border-slate-800/60 last:border-0 flex justify-between items-start text-sm">
+                        <div>
+                            <span class="font-bold text-amber-400 mr-2">${item.qty}x</span>
+                            <span class="text-white">${item.name}</span>
+                            ${item.note ? `<p class="text-xs text-amber-300/80 mt-0.5 bg-amber-500/10 px-2 py-0.5 rounded inline-block">⚠️ ${item.note}</p>` : ''}
+                        </div>
+                    </li>
+                `).join('');
+
+                card.innerHTML = `
+                    <!-- Compacte balk -->
+                    <div onclick="toggleExpand('${order.id}')" class="p-4 flex items-center justify-between cursor-pointer hover:bg-slate-800/40 transition select-none">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-xs uppercase tracking-wider font-semibold px-2.5 py-1 rounded-full ${order.type === 'Bezorgen' ? 'bg-blue-500/20 text-blue-400' : 'bg-emerald-500/20 text-emerald-400'}">
+                                ${order.type}
+                            </span>
+                            <div>
+                                <div class="flex items-center space-x-2">
+                                    <h3 class="font-bold text-base text-white">${order.customer}</h3>
+                                    ${order.isNew ? '<span class="bg-rose-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider animate-pulse">NEW</span>' : ''}
+                                    <span class="text-xs text-slate-400">• ${order.address}</span>
+                                </div>
+                                <span class="text-xs text-slate-400">Ontvangen om ${orderTimeStr} ${!isToday(order.deliveryDate) ? '• Levering: ' + deliveryDateStr : ''}</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-6">
+                            <div class="text-right">
+                                <span class="text-xs text-amber-400/90 font-medium block">Verwacht: ${expectedTimeStr} (${order.prepTime} min)</span>
+                                <span class="text-base font-bold text-emerald-400">${order.total}</span>
+                            </div>
+                            <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-300 transform transition-transform ${order.expanded ? 'rotate-180' : ''}">
+                                ▼
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Uitgeklapte details -->
+                    <div class="${order.expanded ? 'block' : 'hidden'} border-t border-slate-800 p-5 bg-slate-950/40 space-y-4">
+                        <div>
+                            <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Bestelde Producten:</h4>
+                            <ul class="space-y-1 bg-slate-900 p-3 rounded-xl border border-slate-800">
+                                ${itemsHtml}
+                            </ul>
+                        </div>
+
+                        <div class="flex justify-between items-center text-xs text-slate-300 bg-slate-900 p-3 rounded-xl border border-slate-800">
+                            <span>Betaalstatus:</span>
+                            <span class="font-medium text-emerald-400">${order.payment}</span>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+                            <div class="flex items-center space-x-3 bg-slate-900 px-4 py-2 rounded-xl border border-slate-800 w-full sm:w-auto justify-between">
+                                <span class="text-xs text-slate-400">Bereidingstijd:</span>
+                                <div class="flex items-center space-x-2">
+                                    <button onclick="event.stopPropagation(); adjustTime('${order.id}', -5)" class="w-8 h-8 bg-slate-800 hover:bg-slate-700 rounded-lg font-bold text-sm">-</button>
+                                    <span class="font-mono font-bold text-amber-400 w-14 text-center">${order.prepTime} min</span>
+                                    <button onclick="event.stopPropagation(); adjustTime('${order.id}', 5)" class="w-8 h-8 bg-slate-800 hover:bg-slate-700 rounded-lg font-bold text-sm">+</button>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center space-x-2 w-full sm:w-auto">
+                                ${order.status === 'nieuw' ? `
+                                    <button onclick="event.stopPropagation(); acceptOrder('${order.id}')" class="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-6 py-2.5 rounded-xl transition text-sm shadow-lg shadow-emerald-900/20">
+                                        Bestelling Accepteren & Printen
+                                    </button>
+                                ` : activeTab !== 'afgerond' ? `
+                                    <button onclick="event.stopPropagation(); printReceipt('${order.id}')" class="bg-slate-800 hover:bg-slate-700 text-xs px-4 py-2.5 rounded-xl font-medium transition">🖨️ Bon Printen</button>
+                                    <button onclick="event.stopPropagation(); completeOrder('${order.id}')" class="bg-blue-600 hover:bg-blue-500 text-xs px-4 py-2.5 rounded-xl font-medium transition text-white">Klaar / Afgerond</button>
+                                ` : `
+                                    <span class="text-xs text-slate-400 italic">Reeds afgerond</span>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        function toggleExpand(id) {
+            const order = orders.find(o => o.id === id);
+            if(order) {
+                order.expanded = !order.expanded;
+                if(order.expanded && order.isNew) {
+                    order.isNew = false; // NEW label verdwijnt bij openklappen
+                }
+                renderOrders();
+            }
+        }
+
+        function adjustTime(id, amount) {
+            const order = orders.find(o => o.id === id);
+            if(order) {
+                order.prepTime = Math.max(5, order.prepTime + amount);
+                renderOrders();
+            }
+        }
+
+        function acceptOrder(id) {
+            const order = orders.find(o => o.id === id);
+            if(order) {
+                order.status = 'geaccepteerd';
+                order.expanded = false;
+                order.isNew = false;
+                renderOrders();
+            }
+        }
+
+        function completeOrder(id) {
+            const order = orders.find(o => o.id === id);
+            if(order) {
+                order.status = 'afgerond';
+                order.expanded = false;
+                renderOrders();
+                
+                // Activeer direct de review/feedback mail logica (1 uur na verwachte tijd)
+                scheduleReviewEmail(order);
+            }
+        }
+
+        function printReceipt(id) {
+            alert("Bon is succesvol naar de keukenprinter gestuurd!");
+        }
+
+        // ==========================================
+        // HOOFDSTUK 6: MAIL AUTOMATISATIE
+        // ==========================================
+        
+        // 1. Directe Bevestigingsmail (Binnen 1 uur verwacht)
+        function sendInstantConfirmationEmail(order) {
+            const subject = "Bedankt voor je bestelling bij Borgo Antico! 🍕";
+            const body = `Hoi ${order.customer},\n\nBedankt voor je bestelling! We hebben hem in goede orde ontvangen en onze keuken is er direct mee aan de slag gegaan.\n\nJe bestelling wordt verwacht om ${formatTime(order.expDate)}.\n\nTot zo!\nTeam Borgo Antico`;
+            
+            console.log(`[MAIL 1 - DIRECT VERZONDEN NAAR ${order.email}]`);
+            console.log(`Onderwerp: ${subject}\nInhoud:\n${body}`);
+        }
+
+        // 2. Geplande Bevestigingsmail (Meer dan 1 uur / Ochtend- of Toekomstige bestelling)
+        function sendScheduledConfirmationEmail(order) {
+            const subject = "Je vooruitbestelling bij Borgo Antico is ingepland! 🕒";
+            const body = `Hoi ${order.customer},\n\nBedankt voor je vooruitbestelling! We hebben deze veilig voor je ingepland voor ${formatDate(order.deliveryDate)} om ${formatTime(order.expDate)}.\n\nZodra onze keuken open is, gaan we dit met alle zorg voor je bereiden.\n\nTeam Borgo Antico`;
+            
+            console.log(`[MAIL 2 - GEPLAND VERZONDEN NAAR ${order.email}]`);
+            console.log(`Onderwerp: ${subject}\nInhoud:\n${body}`);
+        }
+
+        // 3. Interne Back-up Mail naar het restaurant zelf
+        function sendInternalBackupEmail(order) {
+            const subject = `🔔 Nieuwe online bestelling (${order.id})`;
+            const body = `Nieuwe bestelling binnengekomen:\n- Klant: ${order.customer}\n- Type: ${order.type}\n- Verwachte tijd: ${formatTime(order.expDate)}\n- Totaal: ${order.total}`;
+            
+            console.log(`[INTERNE BACK-UP NAAR info@borgoantico.online]`);
+            console.log(`Onderwerp: ${subject}\nInhoud:\n${body}`);
+        }
+
+        // 4. Review & Feedback E-mail (Wordt automatisch ingepland 1 uur na verwachte tijd)
+        function scheduleReviewEmail(order) {
+            const subject = "Hoe heeft het gesmaakt bij Borgo Antico? 🌟";
+            const body = `Hoi ${order.customer},\n\nWe zijn benieuwd naar je ervaring!\n\n[ 👍 JA, HEERLIJK! ] -> Link naar Google Reviews\n[ 👎 ER GING IETS MIS... ] -> Link naar info@borgoantico.online\n\nTeam Borgo Antico`;
+            
+            console.log(`[MAIL 3 - REVIEW GEPLAND OVER 1 UUR VOOR ${order.email}]`);
+            console.log(`Onderwerp: ${subject}\nInhoud:\n${body}`);
+        }
+
+        renderOrders();
+    </script>
+</body>
+</html>

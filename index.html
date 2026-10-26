@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Borgo Antico – Italiaans Restaurant Zevenhuizen</title>
+    <!-- Tailwind CSS voor strakke en snelle opmaak -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-stone-50 text-stone-800 font-sans">
+
+    <!-- Navigatiebalk (Sticky) -->
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-stone-200">
+        <div class="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="index.html" class="text-2xl font-serif tracking-wide text-stone-900">BORGO ANTICO</a>
+            <nav class="hidden md:flex gap-8 text-sm uppercase tracking-wider font-medium text-stone-600">
+                <a href="index.html" class="text-stone-900 font-semibold">Home</a>
+                <a href="menukaart.html" class="hover:text-stone-900 transition">Menukaart</a>
+                <a href="over-ons.html" class="hover:text-stone-900 transition">Over Ons</a>
+                <a href="contact.html" class="hover:text-stone-900 transition">Contact</a>
+            </nav>
+            <div class="flex items-center gap-3">
+                <a href="bestellen.html" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm">Bestellen</a>
+                <a href="contact.html" class="bg-stone-900 hover:bg-stone-800 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm">Reserveren</a>
+                <a href="account.html" class="bg-stone-800 hover:bg-stone-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm border border-amber-600/50">Inloggen</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero / Sfeersectie -->
+    <section class="relative bg-stone-900 text-white py-28 px-6 text-center">
+        <div class="absolute inset-0 bg-black/40 z-0"></div>
+        <div class="relative z-10 max-w-3xl mx-auto">
+            <span class="text-amber-400 uppercase tracking-widest text-xs font-semibold block mb-3">Benvenuti bij Borgo Antico</span>
+            <h1 class="text-4xl md:text-6xl font-serif mb-6 leading-tight">We brengen een klein stukje Italië naar Zevenhuizen.</h1>
+            <p class="text-stone-300 text-lg mb-10 max-w-xl mx-auto">Proef de pure smaken van de Italiaanse keuken. Bereid met liefde, verse seizoensproducten en volgens traditioneel familierecept.</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="bestellen.html" class="bg-amber-600 hover:bg-amber-700 text-white font-medium px-8 py-3.5 rounded transition shadow-lg">Bestel nu</a>
+                <a href="contact.html" class="bg-white/10 hover:bg-white/25 border border-white/30 text-white font-medium px-8 py-3.5 rounded transition">Reserveer nu</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Korte Introductie: Het Verhaal -->
+    <section class="py-20 px-6 max-w-4xl mx-auto text-center">
+        <h2 class="text-3xl font-serif mb-6">La Cucina Povera</h2>
+        <p class="text-stone-600 leading-relaxed text-lg mb-8">
+            De roots van de familie Marfella liggen in een klein vissersdorpje net buiten Napels waar eten, drinken en genieten onlosmakelijk met elkaar verbonden zijn. Onze kookstijl is gericht op het ten volste benutten van verse producten en ingrediënten die er in het seizoen zijn en het maximaliseren van de smaak. Geen poespas, maar puur genieten.
+        </p>
+        <a href="over-ons.html" class="text-stone-900 font-semibold underline underline-offset-8 hover:text-amber-600 transition">Lees ons hele verhaal &rarr;</a>
+    </section>
+
+    <!-- Google Reviews Slideshow (Met 4 zorgvuldig uitgezochte reviews) -->
+    <section class="bg-stone-100 py-20 px-6 border-y border-stone-200">
+        <div class="max-w-3xl mx-auto text-center">
+            <span class="text-amber-700 uppercase tracking-widest text-xs font-semibold block mb-2">Wat onze gasten zeggen</span>
+            <h2 class="text-3xl font-serif mb-12">Ervaringen van Gasten</h2>
+
+            <!-- De Slideshow Container -->
+            <div class="relative bg-white p-8 md:p-12 rounded-2xl shadow-sm border border-stone-200 min-h-[220px] flex flex-col justify-between">
+                
+                <!-- Review 1 -->
+                <div class="review-slide transition-opacity duration-500">
+                    <div class="flex justify-center gap-1 text-amber-500 mb-4">★★★★★</div>
+                    <p class="text-stone-700 text-lg italic mb-6">
+                        "Heerlijk gegeten! De pizza's smaken alsof je in Italië bent en de bediening is ontzettend gastvrij. Absolute aanrader in Zevenhuizen!"
+                    </p>
+                    <p class="font-semibold text-stone-900">— Marco van der Meer</p>
+                </div>
+
+                <!-- Review 2 -->
+                <div class="review-slide hidden transition-opacity duration-500">
+                    <div class="flex justify-center gap-1 text-amber-500 mb-4">★★★★★</div>
+                    <p class="text-stone-700 text-lg italic mb-6">
+                        "Gaan hier regelmatig eten. Heerlijk eten, supervriendelijke eigenaren en bediening. Gezellige sfeer; echt een toprestaurant!"
+                    </p>
+                    <p class="font-semibold text-stone-900">— Paul & Helma Gerlach</p>
+                </div>
+
+                <!-- Review 3 -->
+                <div class="review-slide hidden transition-opacity duration-500">
+                    <div class="flex justify-center gap-1 text-amber-500 mb-4">★★★★★</div>
+                    <p class="text-stone-700 text-lg italic mb-6">
+                        "Echte 'Cucina Povera' zoals het hoort. Geen poespas, maar pure en eerlijke smaken van topkwaliteit. Je loopt zo Italië binnen!"
+                    </p>
+                    <p class="font-semibold text-stone-900">— Frans de Jong</p>
+                </div>
+
+                <!-- Review 4 -->
+                <div class="review-slide hidden transition-opacity duration-500">
+                    <div class="flex justify-center gap-1 text-amber-500 mb-4">★★★★★</div>
+                    <p class="text-stone-700 text-lg italic mb-6">
+                        "De eigenaar is een ware gastheer die zijn klanten op perfecte wijze een thuisgevoel geeft. De pasta uit de parmezaanse kaas is een belevenis!"
+                    </p>
+                    <p class="font-semibold text-stone-900">— Jeffrey Strik</p>
+                </div>
+
+                <!-- Pijltjes links en rechts -->
+                <button onclick="prevReview()" class="absolute left-4 top-1/2 -translate-y-1/2 bg-stone-100 hover:bg-stone-200 text-stone-700 w-10 h-10 rounded-full flex items-center justify-center transition shadow-sm">&larr;</button>
+                <button onclick="nextReview()" class="absolute right-4 top-1/2 -translate-y-1/2 bg-stone-100 hover:bg-stone-200 text-stone-700 w-10 h-10 rounded-full flex items-center justify-center transition shadow-sm">&rarr;</button>
+
+            </div>
+
+            <!-- 4 Bolletjes indicator onder de slider -->
+            <div class="flex justify-center gap-2 mt-6">
+                <span class="dot w-3 h-3 rounded-full bg-amber-600 cursor-pointer transition" onclick="currentReview(0)"></span>
+                <span class="dot w-3 h-3 rounded-full bg-stone-300 cursor-pointer transition" onclick="currentReview(1)"></span>
+                <span class="dot w-3 h-3 rounded-full bg-stone-300 cursor-pointer transition" onclick="currentReview(2)"></span>
+                <span class="dot w-3 h-3 rounded-full bg-stone-300 cursor-pointer transition" onclick="currentReview(3)"></span>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- JavaScript voor de slideshow met 4 items -->
+    <script>
+        let slideIndex = 0;
+        let slides = document.getElementsByClassName("review-slide");
+        let dots = document.getElementsByClassName("dot");
+
+        function showSlides(n) {
+            if (n >= slides.length) { slideIndex = 0; }
+            if (n < 0) { slideIndex = slides.length - 1; }
+            
+            for (let i = 0; i < slides.length; i++) {
+                slides[i].classList.add("hidden");
+                dots[i].classList.remove("bg-amber-600");
+                dots[i].classList.add("bg-stone-300");
+            }
+            
+            slides[slideIndex].classList.remove("hidden");
+            dots[slideIndex].classList.remove("bg-stone-300");
+            dots[slideIndex].classList.add("bg-amber-600");
+        }
+
+        function nextReview() {
+            slideIndex++;
+            showSlides(slideIndex);
+        }
+
+        function prevReview() {
+            slideIndex--;
+            showSlides(slideIndex);
+        }
+
+        function currentReview(n) {
+            slideIndex = n;
+            showSlides(slideIndex);
+        }
+
+        // Automatisch doorschuiven elke 5 seconden
+        setInterval(function() {
+            slideIndex++;
+            showSlides(slideIndex);
+        }, 5000);
+    </script>
+
+    <!-- Footer -->
+    <footer class="bg-stone-900 text-stone-400 py-12 px-6 border-t border-stone-800 text-center text-sm">
+        <p class="mb-2 text-white font-serif text-lg">Borgo Antico</p>
+        <p>Dorpsstraat 63, 2761 AA Zevenhuizen | 0180-632688 | info@borgoantico.nl</p>
+        <p class="mt-6 text-stone-600">&copy; 2026 Borgo Antico. Alle rechten voorbehouden.</p>
+    </footer>
+
+</body>
+</html>

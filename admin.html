@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beheerdersomgeving (Back-office) – Borgo Antico</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-stone-100 text-stone-800 font-sans">
+
+    <!-- BEHEERDER INLOGSCHERM -->
+    <div id="adminLoginScreen" class="fixed inset-0 bg-stone-900 z-50 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl p-8 shadow-2xl space-y-6 text-center">
+            <span class="text-amber-700 uppercase tracking-widest text-xs font-semibold block">Borgo Antico Beheer</span>
+            <h1 class="text-3xl font-serif text-stone-900">Back-office Login</h1>
+            <p class="text-stone-500 text-sm">Voer het beheerderswachtwoord in om toegang te krijgen tot het dashboard.</p>
+
+            <form onsubmit="handleAdminLogin(event)" class="space-y-4 text-left">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Wachtwoord</label>
+                    <input type="password" id="adminPasswordInput" required placeholder="Voer wachtwoord in (test: 1234)" class="w-full border border-stone-300 rounded-xl p-3 text-sm focus:outline-none focus:border-amber-600 bg-stone-50">
+                </div>
+                <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3.5 rounded-xl transition text-sm shadow-md">Inloggen op Beheer</button>
+            </form>
+            <p class="text-xs text-stone-400"><a href="index.html" class="hover:underline">&larr; Terug naar de website</a></p>
+        </div>
+    </div>
+
+    <!-- HOOFD DASHBOARD -->
+    <div id="adminDashboard" class="hidden min-h-screen flex flex-col justify-between">
+        
+        <!-- Header -->
+        <header class="sticky top-0 z-40 bg-stone-900 text-white shadow-md">
+            <div class="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleSidebar()" class="text-stone-300 hover:text-white p-2 rounded-lg hover:bg-stone-800 transition focus:outline-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                    <div>
+                        <a href="#" onclick="showHomeDashboard()" class="text-xl font-serif tracking-wide hover:text-amber-400 transition block">
+                            BORGO ANTICO <span class="text-amber-400 text-xs uppercase tracking-widest block font-sans">Beheerdersomgeving</span>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <button onclick="adminLogout()" class="bg-stone-800 hover:bg-stone-700 text-red-400 px-4 py-2 rounded-xl text-sm font-semibold transition border border-stone-700">Uitloggen</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- ZIJMENU -->
+        <div id="sidebarMenu" class="fixed inset-y-0 left-0 w-72 bg-stone-900 text-white z-50 shadow-2xl transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col justify-between p-6">
+            <div class="space-y-6">
+                <div class="flex justify-between items-center border-b border-stone-800 pb-4">
+                    <h3 class="font-serif text-lg tracking-wide">Menu</h3>
+                    <button onclick="toggleSidebar()" class="text-stone-400 hover:text-white text-xl font-bold w-8 h-8 rounded-full bg-stone-800 flex items-center justify-center">&times;</button>
+                </div>
+                
+                <nav class="space-y-2 text-sm">
+                    <!-- Menu Beheer Dropdown -->
+                    <div>
+                        <button onclick="toggleSubMenu('menuSubDropdown', 'menuDropdownArrow')" class="w-full flex justify-between items-center px-4 py-3 rounded-xl bg-stone-800 text-white font-semibold hover:bg-stone-700 transition">
+                            <span>Menu Beheer</span>
+                            <svg id="menuDropdownArrow" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        
+                        <div id="menuSubDropdown" class="pl-4 pt-2 space-y-1 hidden">
+                            <a href="#" onclick="switchTab('menuSection'); toggleSidebar();" class="block px-4 py-2 rounded-lg text-stone-300 hover:bg-stone-800 hover:text-white transition text-xs">Overzicht & Prijzen</a>
+                            <a href="#" onclick="switchTab('addCategorySection'); toggleSidebar();" class="block px-4 py-2 rounded-lg text-stone-300 hover:bg-stone-800 hover:text-white transition text-xs">Categorieën Beheer</a>
+                            <a href="#" onclick="switchTab('addItemSection'); toggleSidebar();" class="block px-4 py-2 rounded-lg text-stone-300 hover:bg-stone-800 hover:text-white transition text-xs">Artikel Toevoegen</a>
+                        </div>
+                    </div>
+
+                    <!-- Kortingen Beheren Dropdown -->
+                    <div>
+                        <button onclick="toggleSubMenu('kortingenSubDropdown', 'kortingenDropdownArrow')" class="w-full flex justify-between items-center px-4 py-3 rounded-xl bg-stone-800 text-white font-semibold hover:bg-stone-700 transition">
+                            <span>Kortingen Beheren</span>
+                            <svg id="kortingenDropdownArrow" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        
+                        <div id="kortingenSubDropdown" class="pl-4 pt-2 space-y-1 hidden">
+                            <a href="#" onclick="switchTab('kortingenOverzichtSection'); toggleSidebar();" class="block px-4 py-2 rounded-lg text-stone-300 hover:bg-stone-800 hover:text-white transition text-xs">Actieve Acties</a>
+                            <a href="#" onclick="switchTab('addKortingSection'); toggleSidebar();" class="block px-4 py-2 rounded-lg text-stone-300 hover:bg-stone-800 hover:text-white transition text-xs">Actie Toevoegen</a>
+                        </div>
+                    </div>
+
+                    <!-- Openingstijden Knop -->
+                    <a href="#" onclick="switchTab('openingstijdenSection'); toggleSidebar();" class="block px-4 py-3 rounded-xl text-stone-300 hover:bg-stone-800 hover:text-white transition font-semibold">Openingstijden</a>
+
+                    <!-- Bezorggebieden Knop -->
+                    <a href="#" onclick="switchTab('bezorggebiedenSection'); toggleSidebar();" class="block px-4 py-3 rounded-xl text-stone-300 hover:bg-stone-800 hover:text-white transition font-semibold">Bezorggebieden</a>
+                </nav>
+            </div>
+            <div class="border-t border-stone-800 pt-4 text-xs text-stone-500">
+                <p>Borgo Antico Beheer v1.0</p>
+            </div>
+        </div>
+
+        <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-40 hidden transition-opacity"></div>
+
+        <!-- Inhoud Dashboard -->
+        <main class="max-w-5xl mx-auto px-6 py-10 w-full space-y-12">
+
+            <!-- HOME DASHBOARD BLOKKEN -->
+            <div id="homeDashboardCards" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <!-- Blok 1: Status Keuken -->
+                <div class="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <span class="text-xs font-semibold uppercase tracking-wider text-stone-400 block mb-1">Status Keuken</span>
+                        <div id="kitchenStatusDisplay" class="flex items-center gap-2 mt-1">
+                            <span id="kitchenDot" class="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
+                            <h3 id="kitchenStatusText" class="text-xl font-serif text-green-600 font-bold">Open voor bestellingen</h3>
+                        </div>
+                        <p id="kitchenStatusSub" class="text-stone-500 text-xs mt-1">Volgt automatische openingstijden.</p>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-stone-100 flex items-center justify-between">
+                        <span class="text-xs font-medium text-stone-600">Handmatige bediening:</span>
+                        <button id="toggleKitchenBtn" onclick="toggleKitchenStatus()" class="bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition">Zet op Gesloten</button>
+                    </div>
+                </div>
+
+                <!-- Blok 2: Actieve Kortingscodes -->
+                <div onclick="switchTab('kortingenOverzichtSection')" class="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm hover:border-amber-600 hover:shadow-md cursor-pointer transition flex flex-col justify-between">
+                    <div>
+                        <span class="text-xs font-semibold uppercase tracking-wider text-stone-400 block mb-1">Actieve Kortingscodes</span>
+                        <h3 id="activeCodesCount" class="text-2xl font-serif text-stone-900 mt-1">2 Codes Actief</h3>
+                        <p class="text-stone-500 text-xs mt-1">Klik om acties te beheren &rarr;</p>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-stone-100 text-xs font-semibold text-amber-700 flex items-center gap-1">
+                        <span>Ga naar overzicht</span> &rarr;
+                    </div>
+                </div>
+                
+                <!-- Blok 3: Actieve Bezorggebieden -->
+                <div onclick="switchTab('bezorggebiedenSection')" class="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm hover:border-amber-600 hover:shadow-md cursor-pointer transition flex flex-col justify-between">
+                    <div>
+                        <span class="text-xs font-semibold uppercase tracking-wider text-stone-400 block mb-1">Actieve Bezorggebieden</span>
+                        <h3 id="activeAreasCount" class="text-2xl font-serif text-amber-700 mt-1">2 Gebieden Actief</h3>
+                        <p class="text-stone-500 text-xs mt-1">Klik om gebieden aan/uit te zetten &rarr;</p>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-stone-100 text-xs font-semibold text-amber-700 flex items-center gap-1">
+                        <span>Beheer bezorggebieden</span> &rarr;
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 1. MENUBEHEER & VOORRAAD -->
+            <div id="menuSection" class="admin-section hidden bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
+                <div class="flex justify-between items-center border-b border-stone-100 pb-4">
+                    <div>
+                        <h2 class="text-2xl font-serif text-stone-900">Menubeheer & Voorraad</h2>
+                        <p class="text-stone-500 text-sm">Bekijk de menukaart, pas prijzen aan of verwijder artikelen.</p>
+                    </div>
+                    <button onclick="saveMenuChanges()" class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition shadow-md">Wijzigingen opslaan</button>
+                </div>
+
+                <div id="categoryNavBar" class="flex gap-2 overflow-x-auto pb-2 border-b border-stone-100">
+                    <button onclick="filterMenu('Alles')" class="px-4 py-2 rounded-xl text-xs font-semibold bg-amber-600 text-white whitespace-nowrap transition">Alles</button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-stone-200 text-xs uppercase tracking-wider text-stone-500">
+                                <th class="py-3 px-4">Gerecht & Ingrediënten</th>
+                                <th class="py-3 px-4">Categorie</th>
+                                <th class="py-3 px-4">Prijs (€)</th>
+                                <th class="py-3 px-4 text-center">Status</th>
+                                <th class="py-3 px-4 text-center">Actie</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminMenuList" class="divide-y divide-stone-100 text-sm">
+                            <!-- Dynamisch -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 2. CATEGORIEËN BEHEER -->
+            <div id="addCategorySection" class="admin-section hidden bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
+                <h2 class="text-2xl font-serif text-stone-900 border-b border-stone-100 pb-4">Categorieën Beheer</h2>
+                
+                <form onsubmit="addNewCategory(event)" class="flex gap-4 items-end">
+                    <div class="flex-1">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Nieuwe Categorie Naam</label>
+                        <input type="text" id="newCategoryInput" required placeholder="Bijv. Hoofdgerechten, Salades..." class="w-full border border-stone-300 rounded-xl p-3 text-sm focus:outline-none focus:border-amber-600 bg-stone-50">
+                    </div>
+                    <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-xl text-sm font-semibold transition shadow-md">Categorie toevoegen</button>
+                </form>
+
+                <div class="pt-4">
+                    <h3 class="text-xs font-semibold uppercase tracking-wider text-stone-400 mb-3">Bestaande Categorieën:</h3>
+                    <div class="overflow-x-auto border border-stone-200 rounded-xl">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-stone-200 bg-stone-50 text-xs uppercase tracking-wider text-stone-500">
+                                    <th class="py-3 px-4">Categorienaam</th>
+                                    <th class="py-3 px-4 text-center">Actie</th>
+                                </tr>
+                            </thead>
+                            <tbody id="categoryTableList" class="divide-y divide-stone-100 text-sm">
+                                <!-- Dynamisch -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. ARTIKELEN TOEVOEGEN -->
+            <div id="addItemSection" class="admin-section hidden bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
+                <h2 class="text-2xl font-serif text-stone-900 border-b border-stone-100 pb-4">Artikel Toevoegen</h2>
+                <form onsubmit="addNewItem(event)" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Kies Categorie</label>
+                            <select id="newItemCategory" required class="w-full border border-stone-300 rounded-xl p-3 text-sm focus:outline-none focus:border-amber-600 bg-stone-50 font-medium"></select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Naam Artikel</label>
+                            <input type="text" id="newItemName" required placeholder="Bijv. Spaghetti Carbonara" class="w-full border border-stone-300 rounded-xl p-3 text-sm focus:outline-none focus:border-amber-600 bg-stone-50">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Ingrediënten / Omschrijving</label>
+                            <input type="text" id="newItemIngredients" required placeholder="Bijv. Spaghetti, pancetta, ei, room" class="w-full border border-stone-300 rounded-xl p-3 text-sm focus:outline-none focus:border-amber-600 bg-stone-50">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Prijs (€)</label>
+                            <input type="number" step="0.50" id="newItemPrice" required placeholder="14.50" class="w-full border border-stone-300 rounded-xl p-3 text-sm focus:outline-none focus:border-amber-600 bg-stone-50">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">BTW Keuze</label>
+                        <select id="newItemBtw" class="w-full border border-stone-300 rounded-xl p-3 text-sm focus:outline-none focus:border-amber-600 bg-stone-50 font-medium">
+                            <option value="9">9% BTW (Laag - Eten / Afhalen)</option>
+                            <option value="21">21% BTW (Hoog - Alcohol / Drank)</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3.5 rounded-xl transition text-sm shadow-md mt-4">Artikel opslaan en toevoegen aan menu</button>
+                </form>
+            </div>
+
+            <!-- 4A. KORTINGEN - OVERZICHT -->
+            <div id="kortingenOverzichtSection" class="admin-section hidden bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
+                <div class="flex justify-between items-center border-b border-stone-100 pb-4">
+                    <div>
+                        <h2 class="text-2xl font-serif text-stone-900">Actieve Acties & Kortingen</h2>
+                        <p class="text-stone-500 text-sm">Overzicht van alle lopende actiecodes voor online bestellingen.</p>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto border border-stone-200 rounded-xl">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-stone-200 bg-stone-50 text-xs uppercase tracking-wider text-stone-500">
+                                <th class="py-3 px-4">Actie Naam</th>
+                                <th class="py-3 px-4">Kortingscode</th>
+                                <th class="py-3 px-4">Type / Waarde</th>
+                                <th class="py-3 px-4 text-center">Actie</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminDiscountsList" class="divide-y divide-stone-100 text-sm">
+                            <!-- Dynamisch -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 4B. KORTINGEN - TOEVOEGEN -->
+            <div id="addKortingSection" class="admin-section hidden bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
+                <h2 class="text-2xl font-serif text-stone-900 border-b border-stone-100 pb-4">Nieuwe Actie / Kortingscode Toevoegen</h2>
+                
+                <form onsubmit="addNewDiscount(event)" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Naam van de Actie</label>
+                            <input type="text" id="newDiscName" required placeholder="Bijv. Maandag Korting of Gratis Tiramisu" class="w-full border border-stone-300 rounded-xl p-3 text-sm focus:outline-none focus:border-amber-600 bg-stone-50">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Unieke Code (voor klant)</label>
+                            <input type="text" id="newDiscCode" required placeholder="Bijv. MAANDAG10" class="w-full border border-stone-300 rounded-xl p-3 text-sm focus:outline-none focus:border-amber-600 bg-stone-50 uppercase font-mono font-bold">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Soort Korting</label>
+                            <select id="newDiscType" class="w-full border border-stone-300 rounded-xl p-3 text-sm focus:outline-none focus:border-amber-600 bg-stone-50 font-medium">
+                                <option value="percentage">Percentage korting (%)</option>
+                                <option value="gratis_item">Gratis product / actie</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Waarde (bijv. 10 voor 10%)</label>
+                            <input type="text" id="newDiscValue" required placeholder="Bijv. 10 (of 'tiramisu')" class="w-full border border-stone-300 rounded-xl p-3 text-sm focus:outline-none focus:border-amber-600 bg-stone-50">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3.5 rounded-xl transition text-sm shadow-md mt-4">Kortingscode opslaan en activeren</button>
+                </form>
+            </div>
+
+            <!-- 5. OPENINGSTIJDEN BEHEER -->
+            <div id="openingstijdenSection" class="admin-section hidden bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
+                <div class="flex justify-between items-center border-b border-stone-100 pb-4">
+                    <div>
+                        <h2 class="text-2xl font-serif text-stone-900">Openingstijden Beheren</h2>
+                        <p class="text-stone-500 text-sm">Stel hier per dag de openingstijden in per kwartier.</p>
+                    </div>
+                    <button onclick="saveOpeningHours()" class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition shadow-md">Openingstijden opslaan</button>
+                </div>
+
+                <div class="overflow-x-auto border border-stone-200 rounded-xl">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-stone-200 bg-stone-50 text-xs uppercase tracking-wider text-stone-500">
+                                <th class="py-3 px-4">Dag</th>
+                                <th class="py-3 px-4">Status</th>
+                                <th class="py-3 px-4">Open om</th>
+                                <th class="py-3 px-4">Sluit om</th>
+                            </tr>
+                        </thead>
+                        <tbody id="openingHoursTableList" class="divide-y divide-stone-100 text-sm">
+                            <!-- Wordt dynamisch gevuld -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 6. BEZORGGEBIEDEN BEHEER -->
+            <div id="bezorggebiedenSection" class="admin-section hidden bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
+                <div class="flex justify-between items-center border-b border-stone-100 pb-4">
+                    <div>
+                        <h2 class="text-2xl font-serif text-stone-900">Bezorggebieden Beheren</h2>
+                        <p class="text-stone-500 text-sm">Schakel gebieden aan of uit als het te druk is.</p>
+                    </div>
+                    <button onclick="saveDeliveryAreas()" class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition shadow-md">Wijzigingen opslaan</button>
+                </div>
+
+                <form onsubmit="addNewDeliveryArea(event)" class="flex gap-4 items-end bg-stone-50 p-4 rounded-xl border border-stone-200">
+                    <div class="flex-1">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Nieuw Plaats / Woonplaats</label>
+                        <input type="text" id="newAreaName" required placeholder="Bijv. Moerkapelle" class="w-full border border-stone-300 rounded-xl p-3 text-sm bg-white focus:outline-none focus:border-amber-600">
+                    </div>
+                    <div class="w-48">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Postcode(s)</label>
+                        <input type="text" id="newAreaZip" required placeholder="2761, 2751" class="w-full border border-stone-300 rounded-xl p-3 text-sm bg-white focus:outline-none focus:border-amber-600">
+                    </div>
+                    <button type="submit" class="bg-stone-900 hover:bg-stone-800 text-white px-5 py-3 rounded-xl text-sm font-semibold transition">Gebied toevoegen</button>
+                </form>
+
+                <div class="overflow-x-auto border border-stone-200 rounded-xl">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-stone-200 bg-stone-50 text-xs uppercase tracking-wider text-stone-500">
+                                <th class="py-3 px-4">Plaats / Gebied</th>
+                                <th class="py-3 px-4">Postcodes</th>
+                                <th class="py-3 px-4 text-center">Status (Aan / Uit)</th>
+                                <th class="py-3 px-4 text-center">Actie</th>
+                            </tr>
+                        </thead>
+                        <tbody id="deliveryAreasTableList" class="divide-y divide-stone-100 text-sm">
+                            <!-- Wordt dynamisch gevuld -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+
+        <footer class="bg-stone-900 text-stone-400 py-8 px-6 border-t border-stone-800 text-center text-sm mt-20">
+            <p>Borgo Antico Beheersysteem &copy; 2026</p>
+        </footer>
+
+    </div>
+
+    <!-- JavaScript Logica -->
+    <script>
+        let defaultCategories = ["Voorgerechten", "Pizza's", "Dessert", "Drinken", "Alcohol"];
+        let defaultMenuItems = [
+            { id: 1, name: 'Carpaccio', ingredients: 'Klassieke rundercarpaccio met rucola en parmezaanse kaas', category: 'Voorgerechten', price: 15.00, btw: '9', soldOut: false },
+            { id: 2, name: 'Vitello', ingredients: 'Malse kalfsmuis met traditionele tonijnmayonaise', category: 'Voorgerechten', price: 15.00, btw: '9', soldOut: false },
+            { id: 3, name: 'Focaccia', ingredients: 'Versgebakken Italiaans brood met rozemarijn en zeezout', category: 'Voorgerechten', price: 9.50, btw: '9', soldOut: false },
+            { id: 4, name: 'Pizza Margherita', ingredients: 'Tomatensaus, mozzarella fior di latte', category: "Pizza's", price: 11.50, btw: '9', soldOut: false },
+            { id: 5, name: 'Tiramisu', ingredients: 'Huisgemaakte Italiaanse klassieker met espresso en mascarpone', category: 'Dessert', price: 8.00, btw: '9', soldOut: false }
+        ];
+
+        let defaultDiscounts = [
+            { id: 1, name: '10% Korting (Maandag)', code: 'MAANDAG10', type: 'percentage', value: '10' },
+            { id: 2, name: 'Gratis Tiramisu', code: 'TIRAMISU1', type: 'gratis_item', value: 'tiramisu' }
+        ];
+
+        let defaultOpeningHours = [
+            { day: 'Maandag', open: false, openTime: '16:00', closeTime: '21:30' },
+            { day: 'Dinsdag', open: true, openTime: '16:00', closeTime: '21:30' },
+            { day: 'Woensdag', open: true, openTime: '16:00', closeTime: '21:30' },
+            { day: 'Donderdag', open: true, openTime: '16:00', closeTime: '21:30' },
+            { day: 'Vrijdag', open: true, openTime: '16:00', closeTime: '22:00' },
+            { day: 'Zaterdag', open: true, openTime: '16:00', closeTime: '22:00' },
+            { day: 'Zondag', open: true, openTime: '16:00', closeTime: '21:30' }
+        ];
+
+        let defaultDeliveryAreas = [
+            { id: 1, name: 'Zevenhuizen', zips: '2761', active: true },
+            { id: 2, name: 'Moerkapelle', zips: '2751', active: true }
+        ];
+
+        let currentFilter = 'Alles';
+
+        document.addEventListener("DOMContentLoaded", function() {
+            if (sessionStorage.getItem('borgo_admin_logged') === 'true') {
+                showAdminDashboard();
+            }
+            loadKitchenStatusUI();
+            updateDashboardCounts();
+        });
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebarMenu');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        function toggleSubMenu(dropdownId, arrowId) {
+            const dropdown = document.getElementById(dropdownId);
+            const arrow = document.getElementById(arrowId);
+            dropdown.classList.toggle('hidden');
+            arrow.classList.toggle('rotate-180');
+        }
+
+        function showHomeDashboard() {
+            document.getElementById('homeDashboardCards').classList.remove('hidden');
+            let sections = document.querySelectorAll('.admin-section');
+            sections.forEach(sec => sec.classList.add('hidden'));
+            updateDashboardCounts();
+            loadKitchenStatusUI();
+        }
+
+        function switchTab(sectionId) {
+            document.getElementById('homeDashboardCards').classList.add('hidden');
+            let sections = document.querySelectorAll('.admin-section');
+            sections.forEach(sec => sec.classList.add('hidden'));
+            
+            document.getElementById(sectionId).classList.remove('hidden');
+            if (sectionId === 'menuSection') {
+                loadCategories();
+                loadAdminMenu(currentFilter);
+            } else if (sectionId === 'addCategorySection') {
+                loadCategories();
+            } else if (sectionId === 'addItemSection') {
+                loadCategories();
+            } else if (sectionId === 'kortingenOverzichtSection') {
+                loadAdminDiscounts();
+            } else if (sectionId === 'openingstijdenSection') {
+                loadOpeningHoursUI();
+            } else if (sectionId === 'bezorggebiedenSection') {
+                loadDeliveryAreasUI();
+            }
+        }
+
+        function handleAdminLogin(event) {
+            event.preventDefault();
+            let pass = document.getElementById('adminPasswordInput').value;
+            if (pass === '1234') {
+                sessionStorage.setItem('borgo_admin_logged', 'true');
+                showAdminDashboard();
+            } else {
+                alert('✕ Onjuist wachtwoord! Probeer het opnieuw (test: 1234).');
+            }
+        }
+
+        function showAdminDashboard() {
+            document.getElementById('adminLoginScreen').classList.add('hidden');
+            document.getElementById('adminDashboard').classList.remove('hidden');
+            showHomeDashboard();
+            loadKitchenStatusUI();
+        }
+
+        function adminLogout() {
+            sessionStorage.removeItem('borgo_admin_logged');
+            location.reload();
+        }
+
+        // --- HULPFUNCTIE: BEREKEN HUIDIGE TIJDSSTATUS OP BASIS VAN KLOK & ADMIN ---
+        function checkCurrentTimeSlot() {
+            let now = new Date();
+            let dayIndex = now.getDay(); // 0 = Zondag, 1 = Maandag, etc.
+            let dayNames = ['Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag'];
+            let dayName = dayNames[dayIndex];
+
+            let openingHours = JSON.parse(localStorage.getItem('borgo_opening_hours')) || defaultOpeningHours;
+            let daySchedule = openingHours.find(h => h.day === dayName);
+
+            let currentTimeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+            let isWithinHours = false;
+            
+            if (daySchedule && daySchedule.open) {
+                if (currentTimeStr >= daySchedule.openTime && currentTimeStr <= daySchedule.closeTime) {
+                    isWithinHours = true;
+                }
+            }
+            return { isWithinHours, daySchedule, dayNames, dayIndex, openingHours };
+        }
+
+        // --- BEREKEN EERSTVOLGENDE OPENINGSTIJD ---
+        function getNextOpenTime(now = new Date()) {
+            let openingHours = JSON.parse(localStorage.getItem('borgo_opening_hours')) || defaultOpeningHours;
+            let dayNames = ['Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag'];
+            
+            for (let i = 0; i <= 7; i++) {
+                let checkDate = new Date(now.getTime() + i * 24 * 60 * 60 * 1000);
+                let dayName = dayNames[checkDate.getDay()];
+                let schedule = openingHours.find(h => h.day === dayName);
+                
+                if (schedule && schedule.open) {
+                    let [openH, openM] = schedule.openTime.split(':').map(Number);
+                    let targetDate = new Date(checkDate);
+                    targetDate.setHours(openH, openM, 0, 0);
+                    
+                    if (i > 0 || targetDate > now) {
+                        return { date: targetDate, text: `${schedule.day} om ${schedule.openTime}` };
+                    }
+                }
+            }
+            return { date: new Date(now.getTime() + 24*60*60*1000), text: "de volgende openingstijd" };
+        }
+
+        // --- BEREKEN EERSTVOLGENDE SLUITINGSTIJD ---
+        function getNextCloseTime(now = new Date()) {
+            let openingHours = JSON.parse(localStorage.getItem('borgo_opening_hours')) || defaultOpeningHours;
+            let dayNames = ['Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag'];
+            let dayName = dayNames[now.getDay()];
+            let schedule = openingHours.find(h => h.day === dayName);
+            
+            if (schedule && schedule.open) {
+                let [closeH, closeM] = schedule.closeTime.split(':').map(Number);
+                let targetDate = new Date(now);
+                targetDate.setHours(closeH, closeM, 0, 0);
+                
+                if (targetDate > now) {
+                    return { date: targetDate, text: `${schedule.day} om ${schedule.closeTime}` };
+                }
+            }
+            
+            for (let i = 1; i <= 7; i++) {
+                let checkDate = new Date(now.getTime() + i * 24 * 60 * 60 * 1000);
+                let dayName = dayNames[checkDate.getDay()];
+                let schedule = openingHours.find(h => h.day === dayName);
+                
+                if (schedule && schedule.open) {
+                    let [closeH, closeM] = schedule.closeTime.split(':').map(Number);
+                    let targetDate = new Date(checkDate);
+                    targetDate.setHours(closeH, closeM, 0, 0);
+                    return { date: targetDate, text: `${schedule.day} om ${schedule.closeTime}` };
+                }
+            }
+            return { date: new Date(now.getTime() + 4*60*60*1000), text: "de sluitingstijd" };
+        }
+
+        // --- BEPAAL EFFECTIEVE STATUS (MET AUTOMATISCH VERLOPEN VAN OVERRIDE) ---
+        function getEffectiveKitchenStatus() {
+            let now = new Date();
+            let manualOverride = localStorage.getItem('borgo_manual_override'); // 'closed' of 'open'
+            let expiryTime = parseInt(localStorage.getItem('borgo_override_expiry') || '0', 10);
+            
+            // Als de vervaltijd verstreken is, wissen we de override automatisch zodat hij weer puur op schema loopt
+            if (manualOverride && now.getTime() >= expiryTime) {
+                localStorage.removeItem('borgo_manual_override');
+                localStorage.removeItem('borgo_override_expiry');
+                manualOverride = null;
+            }
+            
+            if (manualOverride === 'closed') return { isOpen: false, override: 'closed' };
+            if (manualOverride === 'open') return { isOpen: true, override: 'open' };
+            
+            let { isWithinHours } = checkCurrentTimeSlot();
+            return { isOpen: isWithinHours, override: null };
+        }
+
+        // --- SLIMME TOGGLE KNOP (SLUITEN OF OPENEN) ---
+        function toggleKitchenStatus() {
+            let status = getEffectiveKitchenStatus();
+            let now = new Date();
+            
+            if (status.isOpen) {
+                // Keuken is open -> Handmatig sluiten tot eerstvolgende openingstijd
+                let nextOpen = getNextOpenTime(now);
+                localStorage.setItem('borgo_manual_override', 'closed');
+                localStorage.setItem('borgo_override_expiry', nextOpen.date.getTime().toString());
+                
+                alert(`⚠️ De keuken is handmatig gesloten!\n\nDe keuken gaat automatisch weer open op ${nextOpen.text} (volgens de openingstijden).`);
+            } else {
+                // Keuken is gesloten -> Handmatig openen tot eerstvolgende sluitingstijd
+                let nextClose = getNextCloseTime(now);
+                localStorage.setItem('borgo_manual_override', 'open');
+                localStorage.setItem('borgo_override_expiry', nextClose.date.getTime().toString());
+                
+                alert(`🟢 De keuken is handmatig geopend!\n\nDe keuken sluit automatisch weer op ${nextClose.text} (volgens de openingstijden).`);
+            }
+            
+            loadKitchenStatusUI();
+        }
+
+        // --- LAAD UI EN SYNCHRONISEER STATUSSEN ---
+        function loadKitchenStatusUI() {
+            let status = getEffectiveKitchenStatus();
+            
+            // Sla op in localStorage zodat de bestelpagina (`bestellen.html`) dit direct overneemt
+            localStorage.setItem('borgo_kitchen_open', status.isOpen ? 'true' : 'false');
+
+            let dot = document.getElementById('kitchenDot');
+            let text = document.getElementById('kitchenStatusText');
+            let sub = document.getElementById('kitchenStatusSub');
+            let btn = document.getElementById('toggleKitchenBtn');
+
+            if (status.isOpen) {
+                if (dot) dot.className = "w-3 h-3 rounded-full bg-green-500 inline-block animate-pulse";
+                if (text) { 
+                    text.innerText = status.override === 'open' ? "Open voor bestellingen (Handmatig)" : "Open voor bestellingen"; 
+                    text.className = "text-xl font-serif text-green-600 font-bold"; 
+                }
+                if (sub) {
+                    sub.innerText = status.override === 'open' ? "Handmatig geopend tot de eerstvolgende sluitingstijd." : "De keuken is geopend volgens de openingstijden.";
+                }
+                if (btn) { 
+                    btn.innerText = "Zet op Gesloten"; 
+                    btn.className = "bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition"; 
+                }
+            } else {
+                if (dot) dot.className = "w-3 h-3 rounded-full bg-red-500 inline-block";
+                if (text) { 
+                    text.innerText = status.override === 'closed' ? "Gesloten wegens drukte (Handmatig)" : "Gesloten (Buiten openingstijden)"; 
+                    text.className = "text-xl font-serif text-red-600 font-bold"; 
+                }
+                if (sub) {
+                    sub.innerText = status.override === 'closed' ? "Handmatig gesloten tot de eerstvolgende openingstijd." : "Online bestellen is tijdelijk uitgeschakeld.";
+                }
+                if (btn) { 
+                    btn.innerText = "Zet open"; 
+                    btn.className = "bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition"; 
+                }
+            }
+        }
+
+        // Telt actieve codes en actieve bezorggebieden voor op het dashboard
+        function updateDashboardCounts() {
+            let discounts = JSON.parse(localStorage.getItem('borgo_discounts')) || defaultDiscounts;
+            let countElem = document.getElementById('activeCodesCount');
+            if (countElem) {
+                countElem.innerText = discounts.length + " Codes Actief";
+            }
+
+            let areas = JSON.parse(localStorage.getItem('borgo_delivery_areas')) || defaultDeliveryAreas;
+            let activeAreas = areas.filter(a => a.active).length;
+            let areasElem = document.getElementById('activeAreasCount');
+            if (areasElem) {
+                areasElem.innerText = activeAreas + " Gebieden Actief";
+            }
+        }
+
+        function loadCategories() {
+            let cats = JSON.parse(localStorage.getItem('borgo_categories')) || defaultCategories;
+            let selectHtml = '';
+            let navHtml = `<button onclick="filterMenu('Alles')" class="px-4 py-2 rounded-xl text-xs font-semibold ${currentFilter === 'Alles' ? 'bg-amber-600 text-white' : 'bg-stone-100 text-stone-700'} whitespace-nowrap transition">Alles</button>`;
+            let tableHtml = '';
+
+            cats.forEach(cat => {
+                selectHtml += `<option value="${cat}">${cat}</option>`;
+                navHtml += `<button onclick="filterMenu(\`${cat}\`)" class="px-4 py-2 rounded-xl text-xs font-semibold ${currentFilter === cat ? 'bg-amber-600 text-white' : 'bg-stone-100 text-stone-700'} whitespace-nowrap transition">${cat}</button>`;
+                
+                tableHtml += `
+                    <tr class="hover:bg-stone-50 transition">
+                        <td class="py-3 px-4 font-medium text-stone-900">${cat}</td>
+                        <td class="py-3 px-4 text-center">
+                            <button onclick="deleteCategory(\`${cat}\`)" class="text-red-500 hover:text-red-700 text-xs font-semibold bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition">Verwijder &times;</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            let selectElem = document.getElementById('newItemCategory');
+            if (selectElem) selectElem.innerHTML = selectHtml;
+            let tableElem = document.getElementById('categoryTableList');
+            if (tableElem) tableElem.innerHTML = tableHtml;
+            let navElem = document.getElementById('categoryNavBar');
+            if (navElem) navElem.innerHTML = navHtml;
+        }
+
+        function addNewCategory(event) {
+            event.preventDefault();
+            let newCat = document.getElementById('newCategoryInput').value.trim();
+            let cats = JSON.parse(localStorage.getItem('borgo_categories')) || defaultCategories;
+
+            if (!cats.includes(newCat)) {
+                cats.push(newCat);
+                localStorage.setItem('borgo_categories', JSON.stringify(cats));
+                document.getElementById('newCategoryInput').value = '';
+                loadCategories();
+                alert('✓ Categorie succesvol toegevoegd!');
+            } else {
+                alert('Deze categorie bestaat al.');
+            }
+        }
+
+        function deleteCategory(categoryName) {
+            if (confirm(`Weet je zeker dat je categorie "${categoryName}" wilt verwijderen? Alle artikelen in deze categorie worden ook automatisch verwijderd!`)) {
+                let cats = JSON.parse(localStorage.getItem('borgo_categories')) || defaultCategories;
+                cats = cats.filter(c => c !== categoryName);
+                localStorage.setItem('borgo_categories', JSON.stringify(cats));
+
+                let menu = JSON.parse(localStorage.getItem('borgo_menu_items')) || defaultMenuItems;
+                menu = menu.filter(item => item.category !== categoryName);
+                localStorage.setItem('borgo_menu_items', JSON.stringify(menu));
+
+                loadCategories();
+                loadAdminMenu(currentFilter);
+                alert(`✓ Categorie "${categoryName}" en alle bijbehorende artikelen zijn verwijderd.`);
+            }
+        }
+
+        function addNewItem(event) {
+            event.preventDefault();
+            let menu = JSON.parse(localStorage.getItem('borgo_menu_items')) || defaultMenuItems;
+
+            let newItem = {
+                id: Date.now(),
+                name: document.getElementById('newItemName').value,
+                ingredients: document.getElementById('newItemIngredients').value,
+                category: document.getElementById('newItemCategory').value,
+                price: parseFloat(document.getElementById('newItemPrice').value),
+                btw: document.getElementById('newItemBtw').value,
+                soldOut: false
+            };
+
+            menu.push(newItem);
+            localStorage.setItem('borgo_menu_items', JSON.stringify(menu));
+            
+            document.getElementById('newItemName').value = '';
+            document.getElementById('newItemIngredients').value = '';
+            document.getElementById('newItemPrice').value = '';
+
+            loadAdminMenu(currentFilter);
+            alert('✓ Artikel succesvol toegevoegd aan het menu!');
+        }
+
+        function filterMenu(category) {
+            currentFilter = category;
+            loadCategories();
+            loadAdminMenu(category);
+        }
+
+        function loadAdminMenu(filter) {
+            let menu = JSON.parse(localStorage.getItem('borgo_menu_items')) || defaultMenuItems;
+            let html = '';
+
+            menu.forEach((item, index) => {
+                if (filter !== 'Alles' && item.category !== filter) return;
+
+                html += `
+                    <tr class="hover:bg-stone-50 transition">
+                        <td class="py-3 px-4">
+                            <p class="font-medium text-stone-900">${item.name}</p>
+                            <p class="text-xs text-stone-500">${item.ingredients || ''}</p>
+                        </td>
+                        <td class="py-3 px-4 text-stone-500">${item.category}</td>
+                        <td class="py-3 px-4">
+                            <input type="number" step="0.50" id="price_${index}" value="${item.price.toFixed(2)}" class="w-24 border border-stone-300 rounded-lg p-1.5 text-sm bg-white">
+                        </td>
+                        <td class="py-3 px-4 text-center">
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="soldout_${index}" ${item.soldOut ? 'checked' : ''} class="sr-only peer">
+                                <div class="w-11 h-6 bg-stone-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                                <span class="ml-2 text-xs font-semibold text-stone-600">${item.soldOut ? 'Uitverkocht' : 'Beschikbaar'}</span>
+                            </label>
+                        </td>
+                        <td class="py-3 px-4 text-center">
+                            <button onclick="deleteMenuItem(${item.id})" class="text-red-500 hover:text-red-700 text-xs font-semibold bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition">Verwijder</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('adminMenuList').innerHTML = html || '<tr><td colspan="5" class="text-center py-6 text-stone-400">Geen artikelen gevonden in deze categorie.</td></tr>';
+        }
+
+        function deleteMenuItem(id) {
+            if (confirm('Weet je zeker dat je dit artikel wilt verwijderen?')) {
+                let menu = JSON.parse(localStorage.getItem('borgo_menu_items')) || defaultMenuItems;
+                menu = menu.filter(item => item.id !== id);
+                localStorage.setItem('borgo_menu_items', JSON.stringify(menu));
+                loadAdminMenu(currentFilter);
+                alert('✓ Artikel is verwijderd.');
+            }
+        }
+
+        function saveMenuChanges() {
+            let menu = JSON.parse(localStorage.getItem('borgo_menu_items')) || defaultMenuItems;
+
+            menu.forEach((item, index) => {
+                let priceInput = document.getElementById(`price_${index}`);
+                let soldOutInput = document.getElementById(`soldout_${index}`);
+                if (priceInput && soldOutInput) {
+                    let newPrice = parseFloat(priceInput.value);
+                    if (!isNaN(newPrice)) item.price = newPrice;
+                    item.soldOut = soldOutInput.checked;
+                }
+            });
+
+            localStorage.setItem('borgo_menu_items', JSON.stringify(menu));
+            alert('✓ Alle prijzen en beschikbaarheid zijn succesvol opgeslagen!');
+            loadAdminMenu(currentFilter);
+        }
+
+        // --- KORTINGEN BEHEER FUNCTIES ---
+        function loadAdminDiscounts() {
+            let discounts = JSON.parse(localStorage.getItem('borgo_discounts')) || defaultDiscounts;
+            let html = '';
+
+            discounts.forEach(disc => {
+                html += `
+                    <tr class="hover:bg-stone-50 transition">
+                        <td class="py-3 px-4 font-medium text-stone-900">${disc.name}</td>
+                        <td class="py-3 px-4"><code class="bg-stone-100 px-2.5 py-1 rounded border border-stone-200 font-mono font-bold text-amber-700">${disc.code}</code></td>
+                        <td class="py-3 px-4 text-stone-600">${disc.type === 'percentage' ? disc.type + ' (' + disc.value + '%)' : 'Gratis item'}</td>
+                        <td class="py-3 px-4 text-center">
+                            <button onclick="deleteDiscount(${disc.id})" class="text-red-500 hover:text-red-700 text-xs font-semibold bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition">Stopzetten &times;</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('adminDiscountsList').innerHTML = html || '<tr><td colspan="4" class="text-center py-6 text-stone-400">Geen actieve acties gevonden.</td></tr>';
+            updateDashboardCounts();
+        }
+
+        function addNewDiscount(event) {
+            event.preventDefault();
+            let discounts = JSON.parse(localStorage.getItem('borgo_discounts')) || defaultDiscounts;
+
+            let newDisc = {
+                id: Date.now(),
+                name: document.getElementById('newDiscName').value,
+                code: document.getElementById('newDiscCode').value.trim().toUpperCase(),
+                type: document.getElementById('newDiscType').value,
+                value: document.getElementById('newDiscValue').value
+            };
+
+            discounts.push(newDisc);
+            localStorage.setItem('borgo_discounts', JSON.stringify(discounts));
+
+            document.getElementById('newDiscName').value = '';
+            document.getElementById('newDiscCode').value = '';
+            document.getElementById('newDiscValue').value = '';
+
+            alert('✓ Kortingscode succesvol toegevoegd en geactiveerd!');
+            switchTab('kortingenOverzichtSection');
+        }
+
+        function deleteDiscount(id) {
+            if (confirm('Weet je zeker dat je deze kortingscode wilt stopzetten en verwijderen?')) {
+                let discounts = JSON.parse(localStorage.getItem('borgo_discounts')) || defaultDiscounts;
+                discounts = discounts.filter(disc => disc.id !== id);
+                localStorage.setItem('borgo_discounts', JSON.stringify(discounts));
+                loadAdminDiscounts();
+                alert('✓ Actie is stopgezet en verwijderd.');
+            }
+        }
+
+        // --- OPENINGSTIJDEN BEHEER FUNCTIES ---
+        function generateTimeOptions(selectedTime) {
+            let options = '';
+            for (let h = 0; h < 24; h++) {
+                for (let m = 0; m < 60; m += 15) {
+                    let hourStr = h < 10 ? '0' + h : h;
+                    let minStr = m < 10 ? '0' + m : m;
+                    let timeVal = `${hourStr}:${minStr}`;
+                    let selected = (timeVal === selectedTime) ? 'selected' : '';
+                    options += `<option value="${timeVal}" ${selected}>${timeVal}</option>`;
+                }
+            }
+            return options;
+        }
+
+        function loadOpeningHoursUI() {
+            let hours = JSON.parse(localStorage.getItem('borgo_opening_hours')) || defaultOpeningHours;
+            let html = '';
+
+            hours.forEach((item, index) => {
+                html += `
+                    <tr class="hover:bg-stone-50 transition">
+                        <td class="py-3 px-4 font-semibold text-stone-900">${item.day}</td>
+                        <td class="py-3 px-4">
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="oh_open_${index}" ${item.open ? 'checked' : ''} class="sr-only peer">
+                                <div class="w-11 h-6 bg-stone-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                                <span class="ml-2 text-xs font-semibold text-stone-600">${item.open ? 'Open' : 'Gesloten'}</span>
+                            </label>
+                        </td>
+                        <td class="py-3 px-4">
+                            <select id="oh_opentime_${index}" class="border border-stone-300 rounded-lg p-2 text-sm bg-white font-medium">
+                                ${generateTimeOptions(item.openTime)}
+                            </select>
+                        </td>
+                        <td class="py-3 px-4">
+                            <select id="oh_closetime_${index}" class="border border-stone-300 rounded-lg p-2 text-sm bg-white font-medium">
+                                ${generateTimeOptions(item.closeTime)}
+                            </select>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('openingHoursTableList').innerHTML = html;
+        }
+
+        function saveOpeningHours() {
+            let hours = JSON.parse(localStorage.getItem('borgo_opening_hours')) || defaultOpeningHours;
+
+            hours.forEach((item, index) => {
+                let isOpen = document.getElementById(`oh_open_${index}`).checked;
+                let openT = document.getElementById(`oh_opentime_${index}`).value;
+                let closeT = document.getElementById(`oh_closetime_${index}`).value;
+
+                item.open = isOpen;
+                item.openTime = openT;
+                item.closeTime = closeT;
+            });
+
+            localStorage.setItem('borgo_opening_hours', JSON.stringify(hours));
+            alert('✓ Openingstijden succesvol opgeslagen!');
+            loadKitchenStatusUI();
+        }
+
+        // --- BEZORGGEBIEDEN BEHEER FUNCTIES ---
+        function loadDeliveryAreasUI() {
+            let areas = JSON.parse(localStorage.getItem('borgo_delivery_areas')) || defaultDeliveryAreas;
+            let html = '';
+
+            areas.forEach((area, index) => {
+                html += `
+                    <tr class="hover:bg-stone-50 transition">
+                        <td class="py-3 px-4 font-semibold text-stone-900">${area.name}</td>
+                        <td class="py-3 px-4 font-mono text-stone-600">${area.zips}</td>
+                        <td class="py-3 px-4 text-center">
+                            <label class="relative inline-flex items-center cursor-pointer justify-center">
+                                <input type="checkbox" id="area_active_${index}" ${area.active ? 'checked' : ''} class="sr-only peer">
+                                <div class="w-11 h-6 bg-stone-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                                <span class="ml-2 text-xs font-semibold text-stone-600">${area.active ? 'Aan' : 'Uit'}</span>
+                            </label>
+                        </td>
+                        <td class="py-3 px-4 text-center">
+                            <button onclick="deleteDeliveryArea(${area.id})" class="text-red-500 hover:text-red-700 text-xs font-semibold bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition">Verwijder &times;</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('deliveryAreasTableList').innerHTML = html || '<tr><td colspan="4" class="text-center py-6 text-stone-400">Geen bezorggebieden ingesteld.</td></tr>';
+        }
+
+        function addNewDeliveryArea(event) {
+            event.preventDefault();
+            let areas = JSON.parse(localStorage.getItem('borgo_delivery_areas')) || defaultDeliveryAreas;
+
+            let newArea = {
+                id: Date.now(),
+                name: document.getElementById('newAreaName').value.trim(),
+                zips: document.getElementById('newAreaZip').value.trim(),
+                active: true
+            };
+
+            areas.push(newArea);
+            localStorage.setItem('borgo_delivery_areas', JSON.stringify(areas));
+
+            document.getElementById('newAreaName').value = '';
+            document.getElementById('newAreaZip').value = '';
+
+            loadDeliveryAreasUI();
+            updateDashboardCounts();
+            alert('✓ Bezorggebied succesvol toegevoegd!');
+        }
+
+        function deleteDeliveryArea(id) {
+            if (confirm('Weet je zeker dat je dit bezorggebied wilt verwijderen?')) {
+                let areas = JSON.parse(localStorage.getItem('borgo_delivery_areas')) || defaultDeliveryAreas;
+                areas = areas.filter(a => a.id !== id);
+                localStorage.setItem('borgo_delivery_areas', JSON.stringify(areas));
+                loadDeliveryAreasUI();
+                updateDashboardCounts();
+                alert('✓ Bezorggebied verwijderd.');
+            }
+        }
+
+        function saveDeliveryAreas() {
+            let areas = JSON.parse(localStorage.getItem('borgo_delivery_areas')) || defaultDeliveryAreas;
+
+            areas.forEach((area, index) => {
+                let isActive = document.getElementById(`area_active_${index}`).checked;
+                area.active = isActive;
+            });
+
+            localStorage.setItem('borgo_delivery_areas', JSON.stringify(areas));
+            updateDashboardCounts();
+            alert('✓ Status van bezorggebieden succesvol opgeslagen!');
+        }
+    </script>
+
+</body>
+</html>
