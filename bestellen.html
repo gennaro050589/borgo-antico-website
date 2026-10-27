@@ -134,7 +134,7 @@
                     <span id="modalOrderTypeBadge" class="bg-amber-100 text-amber-800 text-xs font-bold px-3.5 py-1.5 rounded-xl uppercase tracking-wider border border-amber-300">Bezorgen</span>
                 </div>
                 
-                <!-- Gewenste Datum & Tijd (gekoppeld aan admin openingstijden & stappen van 15 min) -->
+                <!-- Gewenste Datum & Tijd -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-amber-50/50 p-3.5 rounded-xl border border-amber-200 mb-4">
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider text-amber-900 mb-1">Gewenste Datum</label>
@@ -328,7 +328,6 @@
             let dayNames = ['Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag'];
             let dayName = dayNames[selectedDate.getDay()];
 
-            // Haal openingstijden uit localStorage (ingesteld in admin.html)
             let openingHours = JSON.parse(localStorage.getItem('borgo_opening_hours')) || defaultOpeningHours;
             let daySchedule = openingHours.find(h => h.day === dayName);
 
@@ -340,11 +339,9 @@
                 return;
             }
 
-            // Bepaal openingstijd en sluitingstijd van die dag (bijv. "16:00" en "21:30")
             let [openH, openM] = daySchedule.openTime.split(':').map(Number);
             let [closeH, closeM] = daySchedule.closeTime.split(':').map(Number);
 
-            // Als het vandaag is, zorgen we dat de tijd minimaal 30 min in de toekomst ligt
             let now = new Date();
             let isToday = selectedDate.toDateString() === now.toDateString();
             
@@ -359,7 +356,6 @@
                 if (curH > openH || (curH === openH && curM > openM)) {
                     minHour = curH;
                     minMinute = curM;
-                    // Afronden op dichtstbijzijnde kwartier
                     let rem = minMinute % 15;
                     if (rem !== 0) {
                         minMinute += (15 - rem);
@@ -371,7 +367,6 @@
                 }
             }
 
-            // Bouw de opties per kwartier
             let startMinutes = minHour * 60 + minMinute;
             let endMinutes = closeH * 60 + closeM;
 
@@ -385,33 +380,46 @@
             timeSelect.innerHTML = html;
         }
 
-        // --- SLIMME KEUKENSTATUS KOPPELING MET ADMIN.HTML ---
+        // --- SLIMME KEUKENSTATUS KOPPELING MET ADMIN.HTML (INCL. VAKANTIE) ---
         function checkAndSyncKitchenStatus() {
             let now = new Date();
-            let manualOverride = localStorage.getItem('borgo_manual_override'); // 'closed' of 'open'
-            let expiryTime = parseInt(localStorage.getItem('borgo_override_expiry') || '0', 10);
+            let todayStr = now.toISOString().split('T')[0]; // YYYY-MM-DD
 
-            if (manualOverride && now.getTime() >= expiryTime) {
-                localStorage.removeItem('borgo_manual_override');
-                localStorage.removeItem('borgo_override_expiry');
-                manualOverride = null;
-            }
-
+            // 1. Check eerst of we in een vakantieperiode zitten
+            let vacations = JSON.parse(localStorage.getItem('borgo_vacations')) || [];
+            let activeVacation = vacations.find(v => todayStr >= v.startDate && todayStr <= v.endDate);
+            
             let isOpen = false;
-            if (manualOverride === 'closed') {
-                isOpen = false;
-            } else if (manualOverride === 'open') {
-                isOpen = true;
-            } else {
-                let openingHours = JSON.parse(localStorage.getItem('borgo_opening_hours')) || defaultOpeningHours;
-                let dayNames = ['Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag'];
-                let dayName = dayNames[now.getDay()];
-                let daySchedule = openingHours.find(h => h.day === dayName);
+            let vacationStatus = null;
 
-                if (daySchedule && daySchedule.open) {
-                    let currentTimeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
-                    if (currentTimeStr >= daySchedule.openTime && currentTimeStr <= daySchedule.closeTime) {
-                        isOpen = true;
+            if (activeVacation) {
+                isOpen = false;
+                vacationStatus = activeVacation;
+            } else {
+                let manualOverride = localStorage.getItem('borgo_manual_override'); // 'closed' of 'open'
+                let expiryTime = parseInt(localStorage.getItem('borgo_override_expiry') || '0', 10);
+
+                if (manualOverride && now.getTime() >= expiryTime) {
+                    localStorage.removeItem('borgo_manual_override');
+                    localStorage.removeItem('borgo_override_expiry');
+                    manualOverride = null;
+                }
+
+                if (manualOverride === 'closed') {
+                    isOpen = false;
+                } else if (manualOverride === 'open') {
+                    isOpen = true;
+                } else {
+                    let openingHours = JSON.parse(localStorage.getItem('borgo_opening_hours')) || defaultOpeningHours;
+                    let dayNames = ['Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag'];
+                    let dayName = dayNames[now.getDay()];
+                    let daySchedule = openingHours.find(h => h.day === dayName);
+
+                    if (daySchedule && daySchedule.open) {
+                        let currentTimeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+                        if (currentTimeStr >= daySchedule.openTime && currentTimeStr <= daySchedule.closeTime) {
+                            isOpen = true;
+                        }
                     }
                 }
             }
@@ -431,7 +439,9 @@
                 banner.classList.remove('hidden');
                 localStorage.setItem('borgo_kitchen_open', 'false');
                 if (dot) dot.className = "w-3 h-3 rounded-full bg-red-500 inline-block shrink-0";
-                if (title) title.innerText = "Gesloten (Buiten openingstijden)";
+                if (title) {
+                    title.innerText = vacationStatus ? `Gesloten (Vakantie: ${vacationStatus.startDate} t/m ${vacationStatus.endDate})` : "Gesloten (Buiten openingstijden)";
+                }
                 if (sub) sub.innerText = "Plan gerust in voor een latere dag!";
             }
         }
@@ -682,7 +692,6 @@
                 localStorage.removeItem('borgo_user');
             }
 
-            // Sla de bestelling op in localStorage zodat het live keukenscherm hem direct ontvangt
             let newOrderForDashboard = {
                 id: "ORD-" + Math.floor(1000 + Math.random() * 9000),
                 orderTime: new Date(),
@@ -705,7 +714,6 @@
             existingOrders.unshift(newOrderForDashboard);
             localStorage.setItem('borgo_orders', JSON.stringify(existingOrders));
 
-            // Stuur de bestelling door naar onze Netlify e-mailfunctie
             try {
                 let response = await fetch('/.netlify/functions/send-order', {
                     method: 'POST',
