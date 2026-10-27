@@ -95,8 +95,12 @@
         const CORRECT_PIN = "1234";
         let activeTab = 'bestellingen';
 
-        // Laad echte bestellingen vanuit de browser-opslag (localStorage), of begin met een lege lijst als er geen bestellingen zijn
-        let orders = JSON.parse(localStorage.getItem('borgo_orders')) || [];        
+        // Laad echte bestellingen vanuit de browser-opslag (localStorage) en zorg dat datums echte Date-objecten blijven
+        let orders = (JSON.parse(localStorage.getItem('borgo_orders')) || []).map(order => ({
+            ...order,
+            orderTime: new Date(order.orderTime),
+            deliveryDate: new Date(order.deliveryDate)
+        }));        
 
         // ==========================================
         // HOOFDSTUK 4: DASHBOARD & TIJDLOGICA
