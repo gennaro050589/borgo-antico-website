@@ -91,8 +91,20 @@
                         </div>
                     </div>
 
-                    <!-- Openingstijden Knop -->
-                    <a href="#" onclick="switchTab('openingstijdenSection'); toggleSidebar();" class="block px-4 py-3 rounded-xl text-stone-300 hover:bg-stone-800 hover:text-white transition font-semibold">Openingstijden</a>
+                    <!-- Openingstijden Dropdown (NIEUW) -->
+                    <div>
+                        <button onclick="toggleSubMenu('openingstijdenSubDropdown', 'openingstijdenDropdownArrow')" class="w-full flex justify-between items-center px-4 py-3 rounded-xl bg-stone-800 text-white font-semibold hover:bg-stone-700 transition">
+                            <span>Openingstijden</span>
+                            <svg id="openingstijdenDropdownArrow" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        
+                        <div id="openingstijdenSubDropdown" class="pl-4 pt-2 space-y-1 hidden">
+                            <a href="#" onclick="switchTab('openingstijdenSection'); toggleSidebar();" class="block px-4 py-2 rounded-lg text-stone-300 hover:bg-stone-800 hover:text-white transition text-xs">Reguliere Tijden</a>
+                            <a href="#" onclick="switchTab('vakantieSection'); toggleSidebar();" class="block px-4 py-2 rounded-lg text-stone-300 hover:bg-stone-800 hover:text-white transition text-xs">Vakantie toevoegen</a>
+                        </div>
+                    </div>
 
                     <!-- Bezorggebieden Knop -->
                     <a href="#" onclick="switchTab('bezorggebiedenSection'); toggleSidebar();" class="block px-4 py-3 rounded-xl text-stone-300 hover:bg-stone-800 hover:text-white transition font-semibold">Bezorggebieden</a>
@@ -340,6 +352,44 @@
                 </div>
             </div>
 
+            <!-- 5B. VAKANTIE TOEVOEGEN (NIEUW) -->
+            <div id="vakantieSection" class="admin-section hidden bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
+                <div class="flex justify-between items-center border-b border-stone-100 pb-4">
+                    <div>
+                        <h2 class="text-2xl font-serif text-stone-900">Vakantie & Sluitingsdata Beheren</h2>
+                        <p class="text-stone-500 text-sm">Plan vakanties in. Tijdens deze datums is de keuken automatisch gesloten; hierna gelden de reguliere openingstijden weer.</p>
+                    </div>
+                </div>
+
+                <form onsubmit="addNewVacation(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end bg-stone-50 p-4 rounded-xl border border-stone-200">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Startdatum</label>
+                        <input type="date" id="vacationStart" required class="w-full border border-stone-300 rounded-xl p-3 text-sm bg-white focus:outline-none focus:border-amber-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Einddatum (inclusief)</label>
+                        <input type="date" id="vacationEnd" required class="w-full border border-stone-300 rounded-xl p-3 text-sm bg-white focus:outline-none focus:border-amber-600">
+                    </div>
+                    <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-3 rounded-xl text-sm font-semibold transition shadow-md">Vakantie inplannen</button>
+                </form>
+
+                <div class="overflow-x-auto border border-stone-200 rounded-xl">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-stone-200 bg-stone-50 text-xs uppercase tracking-wider text-stone-500">
+                                <th class="py-3 px-4">Startdatum</th>
+                                <th class="py-3 px-4">Einddatum</th>
+                                <th class="py-3 px-4 text-center">Status</th>
+                                <th class="py-3 px-4 text-center">Actie</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vacationTableList" class="divide-y divide-stone-100 text-sm">
+                            <!-- Dynamisch -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <!-- 6. BEZORGGEBIEDEN BEHEER -->
             <div id="bezorggebiedenSection" class="admin-section hidden bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
                 <div class="flex justify-between items-center border-b border-stone-100 pb-4">
@@ -418,6 +468,8 @@
             { id: 2, name: 'Moerkapelle', zips: '2751', active: true }
         ];
 
+        let defaultVacations = [];
+
         let currentFilter = 'Alles';
 
         document.addEventListener("DOMContentLoaded", function() {
@@ -467,6 +519,8 @@
                 loadAdminDiscounts();
             } else if (sectionId === 'openingstijdenSection') {
                 loadOpeningHoursUI();
+            } else if (sectionId === 'vakantieSection') {
+                loadVacationUI();
             } else if (sectionId === 'bezorggebiedenSection') {
                 loadDeliveryAreasUI();
             }
@@ -495,9 +549,18 @@
             location.reload();
         }
 
-        // --- HULPFUNCTIE: BEREKEN HUIDIGE TIJDSSTATUS OP BASIS VAN KLOK & ADMIN ---
+        // --- HULPFUNCTIE: BEREKEN HUIDIGE TIJDSSTATUS INCL. VAKANTIE ---
         function checkCurrentTimeSlot() {
             let now = new Date();
+            let todayStr = now.toISOString().split('T')[0]; // YYYY-MM-DD
+
+            // Check eerst of we in een vakantieperiode zitten
+            let vacations = JSON.parse(localStorage.getItem('borgo_vacations')) || defaultVacations;
+            let activeVacation = vacations.find(v => todayStr >= v.startDate && todayStr <= v.endDate);
+            if (activeVacation) {
+                return { isWithinHours: false, isVacation: true, vacationData: activeVacation };
+            }
+
             let dayIndex = now.getDay(); // 0 = Zondag, 1 = Maandag, etc.
             let dayNames = ['Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag'];
             let dayName = dayNames[dayIndex];
@@ -513,16 +576,23 @@
                     isWithinHours = true;
                 }
             }
-            return { isWithinHours, daySchedule, dayNames, dayIndex, openingHours };
+            return { isWithinHours, isVacation: false, daySchedule, dayNames, dayIndex, openingHours };
         }
 
         // --- BEREKEN EERSTVOLGENDE OPENINGSTIJD ---
         function getNextOpenTime(now = new Date()) {
             let openingHours = JSON.parse(localStorage.getItem('borgo_opening_hours')) || defaultOpeningHours;
             let dayNames = ['Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag'];
+            let vacations = JSON.parse(localStorage.getItem('borgo_vacations')) || defaultVacations;
             
-            for (let i = 0; i <= 7; i++) {
+            for (let i = 0; i <= 30; i++) {
                 let checkDate = new Date(now.getTime() + i * 24 * 60 * 60 * 1000);
+                let checkDateStr = checkDate.toISOString().split('T')[0];
+                
+                // Sla vakantiedagen over bij zoeken naar eerstvolgende opening
+                let inVacation = vacations.some(v => checkDateStr >= v.startDate && checkDateStr <= v.endDate);
+                if (inVacation) continue;
+
                 let dayName = dayNames[checkDate.getDay()];
                 let schedule = openingHours.find(h => h.day === dayName);
                 
@@ -571,13 +641,12 @@
             return { date: new Date(now.getTime() + 4*60*60*1000), text: "de sluitingstijd" };
         }
 
-        // --- BEPAAL EFFECTIEVE STATUS (MET AUTOMATISCH VERLOPEN VAN OVERRIDE) ---
+        // --- BEPAAL EFFECTIEVE STATUS ---
         function getEffectiveKitchenStatus() {
             let now = new Date();
-            let manualOverride = localStorage.getItem('borgo_manual_override'); // 'closed' of 'open'
+            let manualOverride = localStorage.getItem('borgo_manual_override'); 
             let expiryTime = parseInt(localStorage.getItem('borgo_override_expiry') || '0', 10);
             
-            // Als de vervaltijd verstreken is, wissen we de override automatisch zodat hij weer puur op schema loopt
             if (manualOverride && now.getTime() >= expiryTime) {
                 localStorage.removeItem('borgo_manual_override');
                 localStorage.removeItem('borgo_override_expiry');
@@ -587,29 +656,31 @@
             if (manualOverride === 'closed') return { isOpen: false, override: 'closed' };
             if (manualOverride === 'open') return { isOpen: true, override: 'open' };
             
-            let { isWithinHours } = checkCurrentTimeSlot();
-            return { isOpen: isWithinHours, override: null };
+            let timeSlot = checkCurrentTimeSlot();
+            if (timeSlot.isVacation) {
+                return { isOpen: false, vacation: true, vacationData: timeSlot.vacationData };
+            }
+
+            return { isOpen: timeSlot.isWithinHours, override: null };
         }
 
-        // --- SLIMME TOGGLE KNOP (SLUITEN OF OPENEN) ---
+        // --- SLIMME TOGGLE KNOP ---
         function toggleKitchenStatus() {
             let status = getEffectiveKitchenStatus();
             let now = new Date();
             
             if (status.isOpen) {
-                // Keuken is open -> Handmatig sluiten tot eerstvolgende openingstijd
                 let nextOpen = getNextOpenTime(now);
                 localStorage.setItem('borgo_manual_override', 'closed');
                 localStorage.setItem('borgo_override_expiry', nextOpen.date.getTime().toString());
                 
-                alert(`⚠️ De keuken is handmatig gesloten!\n\nDe keuken gaat automatisch weer open op ${nextOpen.text} (volgens de openingstijden).`);
+                alert(`⚠️ De keuken is handmatig gesloten!\n\nDe keuken gaat automatisch weer open op ${nextOpen.text}.`);
             } else {
-                // Keuken is gesloten -> Handmatig openen tot eerstvolgende sluitingstijd
                 let nextClose = getNextCloseTime(now);
                 localStorage.setItem('borgo_manual_override', 'open');
                 localStorage.setItem('borgo_override_expiry', nextClose.date.getTime().toString());
                 
-                alert(`🟢 De keuken is handmatig geopend!\n\nDe keuken sluit automatisch weer op ${nextClose.text} (volgens de openingstijden).`);
+                alert(`🟢 De keuken is handmatig geopend!\n\nDe keuken sluit automatisch weer op ${nextClose.text}.`);
             }
             
             loadKitchenStatusUI();
@@ -619,7 +690,6 @@
         function loadKitchenStatusUI() {
             let status = getEffectiveKitchenStatus();
             
-            // Sla op in localStorage zodat de bestelpagina (`bestellen.html`) dit direct overneemt
             localStorage.setItem('borgo_kitchen_open', status.isOpen ? 'true' : 'false');
 
             let dot = document.getElementById('kitchenDot');
@@ -643,16 +713,84 @@
             } else {
                 if (dot) dot.className = "w-3 h-3 rounded-full bg-red-500 inline-block";
                 if (text) { 
-                    text.innerText = status.override === 'closed' ? "Gesloten wegens drukte (Handmatig)" : "Gesloten (Buiten openingstijden)"; 
+                    if (status.vacation) {
+                        text.innerText = `Gesloten (Vakantie: ${status.vacationData.startDate} t/m ${status.vacationData.endDate})`;
+                    } else {
+                        text.innerText = status.override === 'closed' ? "Gesloten wegens drukte (Handmatig)" : "Gesloten (Buiten openingstijden)"; 
+                    }
                     text.className = "text-xl font-serif text-red-600 font-bold"; 
                 }
                 if (sub) {
-                    sub.innerText = status.override === 'closed' ? "Handmatig gesloten tot de eerstvolgende openingstijd." : "Online bestellen is tijdelijk uitgeschakeld.";
+                    sub.innerText = status.vacation ? "Automatisch gesloten vanwege ingeplande vakantieperiode." : (status.override === 'closed' ? "Handmatig gesloten tot de eerstvolgende openingstijd." : "Online bestellen is tijdelijk uitgeschakeld.");
                 }
                 if (btn) { 
                     btn.innerText = "Zet open"; 
                     btn.className = "bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition"; 
                 }
+            }
+        }
+
+        // --- VAKANTIE BEHEER FUNCTIES (NIEUW) ---
+        function loadVacationUI() {
+            let vacations = JSON.parse(localStorage.getItem('borgo_vacations')) || defaultVacations;
+            let html = '';
+            let todayStr = new Date().toISOString().split('T')[0];
+
+            vacations.forEach((vac) => {
+                let isActive = todayStr >= vac.startDate && todayStr <= vac.endDate;
+                html += `
+                    <tr class="hover:bg-stone-50 transition">
+                        <td class="py-3 px-4 font-semibold text-stone-900">${vac.startDate}</td>
+                        <td class="py-3 px-4 font-semibold text-stone-900">${vac.endDate}</td>
+                        <td class="py-3 px-4 text-center">
+                            <span class="px-3 py-1 rounded-full text-xs font-semibold ${isActive ? 'bg-red-100 text-red-700' : 'bg-stone-100 text-stone-600'}">
+                                ${isActive ? 'Nu Actief (Gesloten)' : 'Gepland'}
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 text-center">
+                            <button onclick="deleteVacation(${vac.id})" class="text-red-500 hover:text-red-700 text-xs font-semibold bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition">Verwijder &times;</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            let listElem = document.getElementById('vacationTableList');
+            if (listElem) listElem.innerHTML = html || '<tr><td colspan="4" class="text-center py-6 text-stone-400">Geen vakanties ingepland.</td></tr>';
+        }
+
+        function addNewVacation(event) {
+            event.preventDefault();
+            let start = document.getElementById('vacationStart').value;
+            let end = document.getElementById('vacationEnd').value;
+
+            if (start > end) {
+                alert('✕ De startdatum kan niet na de einddatum liggen!');
+                return;
+            }
+
+            let vacations = JSON.parse(localStorage.getItem('borgo_vacations')) || defaultVacations;
+            vacations.push({
+                id: Date.now(),
+                startDate: start,
+                endDate: end
+            });
+
+            localStorage.setItem('borgo_vacations', JSON.stringify(vacations));
+            document.getElementById('vacationStart').value = '';
+            document.getElementById('vacationEnd').value = '';
+            loadVacationUI();
+            loadKitchenStatusUI();
+            alert('✓ Vakantie succesvol ingepland!');
+        }
+
+        function deleteVacation(id) {
+            if (confirm('Weet je zeker dat je deze vakantieperiode wilt verwijderen?')) {
+                let vacations = JSON.parse(localStorage.getItem('borgo_vacations')) || defaultVacations;
+                vacations = vacations.filter(v => v.id !== id);
+                localStorage.setItem('borgo_vacations', JSON.stringify(vacations));
+                loadVacationUI();
+                loadKitchenStatusUI();
+                alert('✓ Vakantieperiode verwijderd.');
             }
         }
 
