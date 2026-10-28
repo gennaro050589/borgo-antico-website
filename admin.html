@@ -9,6 +9,10 @@
 </head>
 <body class="bg-stone-100 text-stone-800 font-sans">
 
+    <!-- ================================================================= -->
+    <!-- HOOFDSTUK 1: HTML BASIS, LAYOUT, STYLING & INLOGSCHERM          -->
+    <!-- ================================================================= -->
+
     <!-- BEHEERDER INLOGSCHERM -->
     <div id="adminLoginScreen" class="fixed inset-0 bg-stone-900 z-50 flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-md rounded-2xl p-8 shadow-2xl space-y-6 text-center">
@@ -91,7 +95,7 @@
                         </div>
                     </div>
 
-                    <!-- Openingstijden Dropdown (NIEUW) -->
+                    <!-- Openingstijden Dropdown -->
                     <div>
                         <button onclick="toggleSubMenu('openingstijdenSubDropdown', 'openingstijdenDropdownArrow')" class="w-full flex justify-between items-center px-4 py-3 rounded-xl bg-stone-800 text-white font-semibold hover:bg-stone-700 transition">
                             <span>Openingstijden</span>
@@ -108,6 +112,21 @@
 
                     <!-- Bezorggebieden Knop -->
                     <a href="#" onclick="switchTab('bezorggebiedenSection'); toggleSidebar();" class="block px-4 py-3 rounded-xl text-stone-300 hover:bg-stone-800 hover:text-white transition font-semibold">Bezorggebieden</a>
+
+                    <!-- ANALYTICS DROPDOWN -->
+                    <div>
+                        <button onclick="toggleSubMenu('analyticsSubDropdown', 'analyticsDropdownArrow')" class="w-full flex justify-between items-center px-4 py-3 rounded-xl bg-stone-800 text-white font-semibold hover:bg-stone-700 transition">
+                            <span>Analytics</span>
+                            <svg id="analyticsDropdownArrow" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        
+                        <div id="analyticsSubDropdown" class="pl-4 pt-2 space-y-1 hidden">
+                            <a href="#" onclick="switchTab('rapportenSection'); toggleSidebar();" class="block px-4 py-2 rounded-lg text-stone-300 hover:bg-stone-800 hover:text-white transition text-xs">Rapporten</a>
+                            <a href="#" onclick="switchTab('statistiekenSection'); toggleSidebar();" class="block px-4 py-2 rounded-lg text-stone-300 hover:bg-stone-800 hover:text-white transition text-xs">Statistieken</a>
+                        </div>
+                    </div>
                 </nav>
             </div>
             <div class="border-t border-stone-800 pt-4 text-xs text-stone-500">
@@ -164,6 +183,10 @@
                 </div>
 
             </div>
+
+            <!-- ================================================================= -->
+            <!-- HOOFDSTUK 3: MENUBEHEER, ARTIKELEN & CATEGORIEËN                 -->
+            <!-- ================================================================= -->
 
             <!-- 1. MENUBEHEER & VOORRAAD -->
             <div id="menuSection" class="admin-section hidden bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
@@ -265,6 +288,10 @@
                 </form>
             </div>
 
+            <!-- ================================================================= -->
+            <!-- HOOFDSTUK 4: KORTINGSCODES & BEZORGGEBIEDEN                     -->
+            <!-- ================================================================= -->
+
             <!-- 4A. KORTINGEN - OVERZICHT -->
             <div id="kortingenOverzichtSection" class="admin-section hidden bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
                 <div class="flex justify-between items-center border-b border-stone-100 pb-4">
@@ -325,71 +352,6 @@
                 </form>
             </div>
 
-            <!-- 5. OPENINGSTIJDEN BEHEER -->
-            <div id="openingstijdenSection" class="admin-section hidden bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
-                <div class="flex justify-between items-center border-b border-stone-100 pb-4">
-                    <div>
-                        <h2 class="text-2xl font-serif text-stone-900">Openingstijden Beheren</h2>
-                        <p class="text-stone-500 text-sm">Stel hier per dag de openingstijden in per kwartier.</p>
-                    </div>
-                    <button onclick="saveOpeningHours()" class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition shadow-md">Openingstijden opslaan</button>
-                </div>
-
-                <div class="overflow-x-auto border border-stone-200 rounded-xl">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="border-b border-stone-200 bg-stone-50 text-xs uppercase tracking-wider text-stone-500">
-                                <th class="py-3 px-4">Dag</th>
-                                <th class="py-3 px-4">Status</th>
-                                <th class="py-3 px-4">Open om</th>
-                                <th class="py-3 px-4">Sluit om</th>
-                            </tr>
-                        </thead>
-                        <tbody id="openingHoursTableList" class="divide-y divide-stone-100 text-sm">
-                            <!-- Wordt dynamisch gevuld -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- 5B. VAKANTIE TOEVOEGEN (NIEUW) -->
-            <div id="vakantieSection" class="admin-section hidden bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
-                <div class="flex justify-between items-center border-b border-stone-100 pb-4">
-                    <div>
-                        <h2 class="text-2xl font-serif text-stone-900">Vakantie & Sluitingsdata Beheren</h2>
-                        <p class="text-stone-500 text-sm">Plan vakanties in. Tijdens deze datums is de keuken automatisch gesloten; hierna gelden de reguliere openingstijden weer.</p>
-                    </div>
-                </div>
-
-                <form onsubmit="addNewVacation(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end bg-stone-50 p-4 rounded-xl border border-stone-200">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Startdatum</label>
-                        <input type="date" id="vacationStart" required class="w-full border border-stone-300 rounded-xl p-3 text-sm bg-white focus:outline-none focus:border-amber-600">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Einddatum (inclusief)</label>
-                        <input type="date" id="vacationEnd" required class="w-full border border-stone-300 rounded-xl p-3 text-sm bg-white focus:outline-none focus:border-amber-600">
-                    </div>
-                    <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-3 rounded-xl text-sm font-semibold transition shadow-md">Vakantie inplannen</button>
-                </form>
-
-                <div class="overflow-x-auto border border-stone-200 rounded-xl">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="border-b border-stone-200 bg-stone-50 text-xs uppercase tracking-wider text-stone-500">
-                                <th class="py-3 px-4">Startdatum</th>
-                                <th class="py-3 px-4">Einddatum</th>
-                                <th class="py-3 px-4 text-center">Status</th>
-                                <th class="py-3 px-4 text-center">Actie</th>
-                            </tr>
-                        </thead>
-                        <tbody id="vacationTableList" class="divide-y divide-stone-100 text-sm">
-                            <!-- Dynamisch -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
             <!-- 6. BEZORGGEBIEDEN BEHEER -->
             <div id="bezorggebiedenSection" class="admin-section hidden bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
                 <div class="flex justify-between items-center border-b border-stone-100 pb-4">
@@ -429,6 +391,108 @@
                 </div>
             </div>
 
+            <!-- ================================================================= -->
+            <!-- HOOFDSTUK 5: ANALYTICS, FINANCIËLE RAPPORTEN & STATISTIEKEN       -->
+            <!-- ================================================================= -->
+
+            <!-- 7. RAPPORTEN (ANALYTICS) -->
+            <div id="rapportenSection" class="admin-section hidden bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
+                <div class="flex justify-between items-center border-b border-stone-100 pb-4">
+                    <div>
+                        <h2 class="text-2xl font-serif text-stone-900">Financieel Rapport Inzien & Exporteren</h2>
+                        <p class="text-stone-500 text-sm">Bekijk live omzetcijfers per dag, week, maand of kwartaal voor de boekhouding.</p>
+                    </div>
+                </div>
+
+                <!-- Filter Controls -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end bg-stone-50 p-5 rounded-xl border border-stone-200">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Type Rapport</label>
+                        <select id="reportType" onchange="toggleReportPeriodInput()" class="w-full border border-stone-300 rounded-xl p-3 text-sm bg-white focus:outline-none focus:border-amber-600 font-medium">
+                            <option value="dag">Dagrapport</option>
+                            <option value="week">Weekrapport</option>
+                            <option value="maand">Maandrapport</option>
+                            <option value="kwartaal">Kwartaalrapport</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label id="periodLabel" class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Selecteer Datum</label>
+                        <input type="date" id="reportDateInput" class="w-full border border-stone-300 rounded-xl p-3 text-sm bg-white focus:outline-none focus:border-amber-600">
+                        <select id="reportPeriodSelect" class="w-full border border-stone-300 rounded-xl p-3 text-sm bg-white focus:outline-none focus:border-amber-600 hidden font-medium">
+                            <!-- Dynamisch gevuld -->
+                        </select>
+                    </div>
+                    <div>
+                        <button onclick="generateFinancialReport()" class="w-full bg-amber-600 hover:bg-amber-700 text-white py-3 rounded-xl text-sm font-semibold transition shadow-md">Genereer Rapport</button>
+                    </div>
+                </div>
+
+                <!-- Rapport Resultaat Box -->
+                <div id="reportResultContainer" class="bg-stone-900 text-stone-100 p-8 rounded-2xl shadow-xl space-y-6 font-mono text-sm hidden">
+                    <div class="border-b border-stone-800 pb-4 flex justify-between items-center">
+                        <div>
+                            <h3 id="reportTitle" class="text-lg font-bold font-sans text-amber-400">FINANCIEEL RAPPORT</h3>
+                            <p id="reportSub" class="text-xs text-stone-400">Periode: -</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs uppercase tracking-wider text-stone-400 block">Totale Omzet</span>
+                            <span id="reportTotalRevenue" class="text-2xl font-bold text-emerald-400">€ 0,00</span>
+                        </div>
+                    </div>
+
+                    <!-- Betaalmethoden -->
+                    <div class="space-y-2">
+                        <p class="text-xs font-sans uppercase tracking-wider text-amber-500 font-semibold">Betaalmethoden:</p>
+                        <div id="reportPaymentMethods" class="pl-4 space-y-1 text-stone-300 text-xs">
+                            <!-- Dynamisch -->
+                        </div>
+                    </div>
+
+                    <!-- BTW Specificatie -->
+                    <div class="space-y-2 border-t border-stone-800 pt-4">
+                        <p class="text-xs font-sans uppercase tracking-wider text-amber-500 font-semibold">BTW Specificatie & Omzet:</p>
+                        <div id="reportBtwBreakdown" class="pl-4 space-y-3 text-xs text-stone-300">
+                            <!-- Dynamisch -->
+                        </div>
+                    </div>
+
+                    <!-- Omzet per Categorie -->
+                    <div class="space-y-2 border-t border-stone-800 pt-4">
+                        <p class="text-xs font-sans uppercase tracking-wider text-amber-500 font-semibold">Omzet per Categorie:</p>
+                        <div id="reportCategoryBreakdown" class="pl-4 space-y-1 text-stone-300 text-xs">
+                            <!-- Dynamisch -->
+                        </div>
+                    </div>
+
+                    <!-- Export Acties (Alleen PDF en CSV) -->
+                    <div class="pt-6 border-t border-stone-800 flex flex-wrap gap-3 justify-end font-sans">
+                        <button onclick="alert('Rapport is opgeslagen als PDF.')" class="bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs px-4 py-2.5 rounded-xl font-medium transition border border-stone-700">📄 Opslaan als PDF</button>
+                        <button onclick="exportReportCSV()" class="bg-amber-600 hover:bg-amber-500 text-white text-xs px-4 py-2.5 rounded-xl font-semibold transition shadow-md">📊 Export naar Excel (CSV)</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 8. STATISTIEKEN (ANALYTICS) -->
+            <div id="statistiekenSection" class="admin-section hidden bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
+                <div class="border-b border-stone-100 pb-4">
+                    <h2 class="text-2xl font-serif text-stone-900">Statistieken & Populair</h2>
+                    <p class="text-stone-500 text-sm">Inzicht in de bestsellers en klantentrends.</p>
+                </div>
+                <div id="statsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-stone-50 p-6 rounded-2xl border border-stone-200">
+                        <h3 class="text-sm font-semibold uppercase tracking-wider text-stone-500 mb-3">Meest Bestelde Gerechten</h3>
+                        <ul id="topItemsList" class="space-y-2 text-sm text-stone-800">
+                            <!-- Dynamisch -->
+                        </ul>
+                    </div>
+                    <div class="bg-stone-50 p-6 rounded-2xl border border-stone-200">
+                        <h3 class="text-sm font-semibold uppercase tracking-wider text-stone-500 mb-3">Totaal Aantal Bestellingen</h3>
+                        <p id="statsTotalOrders" class="text-4xl font-serif text-amber-700 font-bold">0</p>
+                        <p class="text-xs text-stone-500 mt-2">Geregistreerd in het systeem.</p>
+                    </div>
+                </div>
+            </div>
+
         </main>
 
         <footer class="bg-stone-900 text-stone-400 py-8 px-6 border-t border-stone-800 text-center text-sm mt-20">
@@ -439,6 +503,9 @@
 
     <!-- JavaScript Logica -->
     <script>
+        // -----------------------------------------------------------------
+        // HOOFDSTUK 2: DASHBOARD & KEUKENBEHEER (OPENINGSTIJDEN & VAKANTIES)
+        // -----------------------------------------------------------------
         let defaultCategories = ["Voorgerechten", "Pizza's", "Dessert", "Drinken", "Alcohol"];
         let defaultMenuItems = [
             { id: 1, name: 'Carpaccio', ingredients: 'Klassieke rundercarpaccio met rucola en parmezaanse kaas', category: 'Voorgerechten', price: 15.00, btw: '9', soldOut: false },
@@ -469,7 +536,6 @@
         ];
 
         let defaultVacations = [];
-
         let currentFilter = 'Alles';
 
         document.addEventListener("DOMContentLoaded", function() {
@@ -478,6 +544,9 @@
             }
             loadKitchenStatusUI();
             updateDashboardCounts();
+            
+            const dateInput = document.getElementById('reportDateInput');
+            if(dateInput) dateInput.valueAsDate = new Date();
         });
 
         function toggleSidebar() {
@@ -523,6 +592,8 @@
                 loadVacationUI();
             } else if (sectionId === 'bezorggebiedenSection') {
                 loadDeliveryAreasUI();
+            } else if (sectionId === 'statistiekenSection') {
+                loadStatistics();
             }
         }
 
@@ -549,25 +620,213 @@
             location.reload();
         }
 
-        // --- HULPFUNCTIE: BEREKEN HUIDIGE TIJDSSTATUS INCL. VAKANTIE ---
+        // -----------------------------------------------------------------
+        // HOOFDSTUK 5: ANALYTICS, FINANCIËLE RAPPORTEN & STATISTIEKEN
+        // -----------------------------------------------------------------
+        function toggleReportPeriodInput() {
+            const type = document.getElementById('reportType').value;
+            const dateInput = document.getElementById('reportDateInput');
+            const periodSelect = document.getElementById('reportPeriodSelect');
+            const label = document.getElementById('periodLabel');
+
+            if (type === 'dag') {
+                dateInput.classList.remove('hidden');
+                periodSelect.classList.add('hidden');
+                label.innerText = 'Selecteer Datum';
+            } else if (type === 'week') {
+                dateInput.classList.add('hidden');
+                periodSelect.classList.remove('hidden');
+                label.innerText = 'Selecteer Week';
+                populateWeeksSelect();
+            } else if (type === 'maand') {
+                dateInput.classList.add('hidden');
+                periodSelect.classList.remove('hidden');
+                label.innerText = 'Selecteer Maand';
+                populateMonthsSelect();
+            } else if (type === 'kwartaal') {
+                dateInput.classList.add('hidden');
+                periodSelect.classList.remove('hidden');
+                label.innerText = 'Selecteer Kwartaal';
+                populateQuartersSelect();
+            }
+        }
+
+        function populateWeeksSelect() {
+            let select = document.getElementById('reportPeriodSelect');
+            let html = '';
+            let currentYear = new Date().getFullYear();
+            for(let w = 1; w <= 52; w++) {
+                html += `<option value="W${w}-${currentYear}">Week ${w}, ${currentYear}</option>`;
+            }
+            select.innerHTML = html;
+        }
+
+        function populateMonthsSelect() {
+            let select = document.getElementById('reportPeriodSelect');
+            let months = ['Januari', 'Februari', 'Maart', 'April', 'Mei', 'Juni', 'Juli', 'Augustus', 'September', 'Oktober', 'November', 'December'];
+            let currentYear = new Date().getFullYear();
+            let html = '';
+            months.forEach((m, index) => {
+                let mNum = String(index + 1).padStart(2, '0');
+                html += `<option value="${currentYear}-${mNum}">${m} ${currentYear}</option>`;
+            });
+            select.innerHTML = html;
+        }
+
+        function populateQuartersSelect() {
+            let select = document.getElementById('reportPeriodSelect');
+            let currentYear = new Date().getFullYear();
+            select.innerHTML = `
+                <option value="Q1-${currentYear}">Kwartaal 1 (Jan - Mrt) ${currentYear}</option>
+                <option value="Q2-${currentYear}">Kwartaal 2 (Apr - Jun) ${currentYear}</option>
+                <option value="Q3-${currentYear}">Kwartaal 3 (Jul - Sep) ${currentYear}</option>
+                <option value="Q4-${currentYear}">Kwartaal 4 (Okt - Dec) ${currentYear}</option>
+            `;
+        }
+
+        function generateFinancialReport() {
+            const type = document.getElementById('reportType').value;
+            let orders = JSON.parse(localStorage.getItem('borgo_orders')) || [];
+            
+            let filteredOrders = orders.filter(o => {
+                let oDate = new Date(o.orderTime || o.deliveryDate || Date.now());
+                if (type === 'dag') {
+                    let selDate = document.getElementById('reportDateInput').value;
+                    let oDateStr = oDate.toISOString().split('T')[0];
+                    return oDateStr === selDate;
+                }
+                return true;
+            });
+
+            let totalRevenue = 0;
+            let paymentMethods = {};
+            let vatBreakdown = { '9': { excl: 0, btw: 0, incl: 0 }, '21': { excl: 0, btw: 0, incl: 0 } };
+            let categories = JSON.parse(localStorage.getItem('borgo_categories')) || defaultCategories;
+            let catRevenue = {};
+            categories.forEach(c => catRevenue[c] = 0);
+
+            filteredOrders.forEach(order => {
+                let amt = parseFloat(String(order.total || '0').replace('€', '').replace(',', '.').trim()) || 0;
+                totalRevenue += amt;
+
+                let pm = order.payment || 'Contant / Tikkie';
+                paymentMethods[pm] = (paymentMethods[pm] || 0) + amt;
+
+                if (order.items && Array.isArray(order.items)) {
+                    order.items.forEach(item => {
+                        let itemPrice = parseFloat(item.price || 10) * (item.qty || 1);
+                        let btwRate = item.btw || '9';
+                        
+                        let r = btwRate === '21' ? 0.21 : 0.09;
+                        let excl = itemPrice / (1 + r);
+                        let btwAmt = itemPrice - excl;
+                        
+                        vatBreakdown[btwRate].incl += itemPrice;
+                        vatBreakdown[btwRate].excl += excl;
+                        vatBreakdown[btwRate].btw += btwAmt;
+
+                        let cat = item.category || 'Voorgerechten';
+                        if(catRevenue[cat] !== undefined) {
+                            catRevenue[cat] += itemPrice;
+                        } else {
+                            catRevenue['Overig'] = (catRevenue['Overig'] || 0) + itemPrice;
+                        }
+                    });
+                } else {
+                    vatBreakdown['9'].incl += amt;
+                    let excl = amt / 1.09;
+                    vatBreakdown['9'].excl += excl;
+                    vatBreakdown['9'].btw += (amt - excl);
+                    catRevenue['Pizza\'s'] = (catRevenue['Pizza\'s'] || 0) + amt;
+                }
+            });
+
+            document.getElementById('reportResultContainer').classList.remove('hidden');
+            document.getElementById('reportTotalRevenue').innerText = '€ ' + totalRevenue.toFixed(2).replace('.', ',');
+            document.getElementById('reportSub').innerText = `Gegenereerd op: ${new Date().toLocaleString('nl-NL')} | Aantal bestellingen: ${filteredOrders.length}`;
+
+            let pmHtml = '';
+            for (let [method, amount] of Object.entries(paymentMethods)) {
+                pmHtml += `<div class="flex justify-between"><span>- ${method.toUpperCase()}:</span> <span>€ ${amount.toFixed(2).replace('.', ',')}</span></div>`;
+            }
+            if(!pmHtml) pmHtml = `<div class="text-stone-500">Geen transacties in deze periode.</div>`;
+            document.getElementById('reportPaymentMethods').innerHTML = pmHtml;
+
+            let btwHtml = `
+                <div>
+                    <p class="font-bold text-amber-400">- Laag (9%):</p>
+                    <div class="pl-4 space-y-0.5">
+                        <div class="flex justify-between"><span>Excl. BTW:</span> <span>€ ${vatBreakdown['9'].excl.toFixed(2).replace('.', ',')}</span></div>
+                        <div class="flex justify-between"><span>BTW (9%):</span> <span>€ ${vatBreakdown['9'].btw.toFixed(2).replace('.', ',')}</span></div>
+                        <div class="flex justify-between font-bold"><span>Incl. BTW:</span> <span>€ ${vatBreakdown['9'].incl.toFixed(2).replace('.', ',')}</span></div>
+                    </div>
+                </div>
+                <div>
+                    <p class="font-bold text-amber-400">- Hoog (21%):</p>
+                    <div class="pl-4 space-y-0.5">
+                        <div class="flex justify-between"><span>Excl. BTW:</span> <span>€ ${vatBreakdown['21'].excl.toFixed(2).replace('.', ',')}</span></div>
+                        <div class="flex justify-between"><span>BTW (21%):</span> <span>€ ${vatBreakdown['21'].btw.toFixed(2).replace('.', ',')}</span></div>
+                        <div class="flex justify-between font-bold"><span>Incl. BTW:</span> <span>€ ${vatBreakdown['21'].incl.toFixed(2).replace('.', ',')}</span></div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('reportBtwBreakdown').innerHTML = btwHtml;
+
+            let catHtml = '';
+            for (let [cat, amount] of Object.entries(catRevenue)) {
+                catHtml += `<div class="flex justify-between"><span>- ${cat}:</span> <span>€ ${amount.toFixed(2).replace('.', ',')}</span></div>`;
+            }
+            document.getElementById('reportCategoryBreakdown').innerHTML = catHtml;
+        }
+
+        function exportReportCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,Categorie,Omzet\n";
+            let total = document.getElementById('reportTotalRevenue').innerText;
+            csvContent += `Totale Omzet,${total}\n`;
+            
+            let encodedUri = encodeURI(csvContent);
+            let link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "borgo_antico_rapport.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function loadStatistics() {
+            let orders = JSON.parse(localStorage.getItem('borgo_orders')) || [];
+            document.getElementById('statsTotalOrders').innerText = orders.length;
+
+            let itemCounts = {};
+            orders.forEach(o => {
+                if(o.items) {
+                    o.items.forEach(i => {
+                        itemCounts[i.name] = (itemCounts[i.name] || 0) + (i.qty || 1);
+                    });
+                }
+            });
+
+            let sortedItems = Object.entries(itemCounts).sort((a,b) => b[1] - a[1]);
+            let html = '';
+            sortedItems.slice(0, 5).forEach(([name, count]) => {
+                html += `<li class="flex justify-between items-center py-2 border-b border-stone-200"><span>${name}</span> <span class="font-bold text-amber-700">${count}x besteld</span></li>`;
+            });
+            document.getElementById('topItemsList').innerHTML = html || '<p class="text-stone-400 text-xs">Nog geen bestellingsegevens beschikbaar.</p>';
+        }
+
+        // --- KITCHEN & OTHER STANDARD ADMIN FUNCTIONS ---
         function checkCurrentTimeSlot() {
             let now = new Date();
-            let todayStr = now.toISOString().split('T')[0]; // YYYY-MM-DD
-
-            // Check eerst of we in een vakantieperiode zitten
+            let todayStr = now.toISOString().split('T')[0];
             let vacations = JSON.parse(localStorage.getItem('borgo_vacations')) || defaultVacations;
             let activeVacation = vacations.find(v => todayStr >= v.startDate && todayStr <= v.endDate);
-            if (activeVacation) {
-                return { isWithinHours: false, isVacation: true, vacationData: activeVacation };
-            }
+            if (activeVacation) return { isWithinHours: false, isVacation: true, vacationData: activeVacation };
 
-            let dayIndex = now.getDay(); // 0 = Zondag, 1 = Maandag, etc.
+            let dayIndex = now.getDay();
             let dayNames = ['Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag'];
             let dayName = dayNames[dayIndex];
-
             let openingHours = JSON.parse(localStorage.getItem('borgo_opening_hours')) || defaultOpeningHours;
             let daySchedule = openingHours.find(h => h.day === dayName);
-
             let currentTimeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
             let isWithinHours = false;
             
@@ -579,7 +838,6 @@
             return { isWithinHours, isVacation: false, daySchedule, dayNames, dayIndex, openingHours };
         }
 
-        // --- BEREKEN EERSTVOLGENDE OPENINGSTIJD ---
         function getNextOpenTime(now = new Date()) {
             let openingHours = JSON.parse(localStorage.getItem('borgo_opening_hours')) || defaultOpeningHours;
             let dayNames = ['Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag'];
@@ -588,8 +846,6 @@
             for (let i = 0; i <= 30; i++) {
                 let checkDate = new Date(now.getTime() + i * 24 * 60 * 60 * 1000);
                 let checkDateStr = checkDate.toISOString().split('T')[0];
-                
-                // Sla vakantiedagen over bij zoeken naar eerstvolgende opening
                 let inVacation = vacations.some(v => checkDateStr >= v.startDate && checkDateStr <= v.endDate);
                 if (inVacation) continue;
 
@@ -600,7 +856,6 @@
                     let [openH, openM] = schedule.openTime.split(':').map(Number);
                     let targetDate = new Date(checkDate);
                     targetDate.setHours(openH, openM, 0, 0);
-                    
                     if (i > 0 || targetDate > now) {
                         return { date: targetDate, text: `${schedule.day} om ${schedule.openTime}` };
                     }
@@ -609,7 +864,6 @@
             return { date: new Date(now.getTime() + 24*60*60*1000), text: "de volgende openingstijd" };
         }
 
-        // --- BEREKEN EERSTVOLGENDE SLUITINGSTIJD ---
         function getNextCloseTime(now = new Date()) {
             let openingHours = JSON.parse(localStorage.getItem('borgo_opening_hours')) || defaultOpeningHours;
             let dayNames = ['Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag'];
@@ -620,28 +874,11 @@
                 let [closeH, closeM] = schedule.closeTime.split(':').map(Number);
                 let targetDate = new Date(now);
                 targetDate.setHours(closeH, closeM, 0, 0);
-                
-                if (targetDate > now) {
-                    return { date: targetDate, text: `${schedule.day} om ${schedule.closeTime}` };
-                }
-            }
-            
-            for (let i = 1; i <= 7; i++) {
-                let checkDate = new Date(now.getTime() + i * 24 * 60 * 60 * 1000);
-                let dayName = dayNames[checkDate.getDay()];
-                let schedule = openingHours.find(h => h.day === dayName);
-                
-                if (schedule && schedule.open) {
-                    let [closeH, closeM] = schedule.closeTime.split(':').map(Number);
-                    let targetDate = new Date(checkDate);
-                    targetDate.setHours(closeH, closeM, 0, 0);
-                    return { date: targetDate, text: `${schedule.day} om ${schedule.closeTime}` };
-                }
+                if (targetDate > now) return { date: targetDate, text: `${schedule.day} om ${schedule.closeTime}` };
             }
             return { date: new Date(now.getTime() + 4*60*60*1000), text: "de sluitingstijd" };
         }
 
-        // --- BEPAAL EFFECTIEVE STATUS ---
         function getEffectiveKitchenStatus() {
             let now = new Date();
             let manualOverride = localStorage.getItem('borgo_manual_override'); 
@@ -657,39 +894,30 @@
             if (manualOverride === 'open') return { isOpen: true, override: 'open' };
             
             let timeSlot = checkCurrentTimeSlot();
-            if (timeSlot.isVacation) {
-                return { isOpen: false, vacation: true, vacationData: timeSlot.vacationData };
-            }
+            if (timeSlot.isVacation) return { isOpen: false, vacation: true, vacationData: timeSlot.vacationData };
 
             return { isOpen: timeSlot.isWithinHours, override: null };
         }
 
-        // --- SLIMME TOGGLE KNOP ---
         function toggleKitchenStatus() {
             let status = getEffectiveKitchenStatus();
             let now = new Date();
-            
             if (status.isOpen) {
                 let nextOpen = getNextOpenTime(now);
                 localStorage.setItem('borgo_manual_override', 'closed');
                 localStorage.setItem('borgo_override_expiry', nextOpen.date.getTime().toString());
-                
                 alert(`⚠️ De keuken is handmatig gesloten!\n\nDe keuken gaat automatisch weer open op ${nextOpen.text}.`);
             } else {
                 let nextClose = getNextCloseTime(now);
                 localStorage.setItem('borgo_manual_override', 'open');
                 localStorage.setItem('borgo_override_expiry', nextClose.date.getTime().toString());
-                
                 alert(`🟢 De keuken is handmatig geopend!\n\nDe keuken sluit automatisch weer op ${nextClose.text}.`);
             }
-            
             loadKitchenStatusUI();
         }
 
-        // --- LAAD UI EN SYNCHRONISEER STATUSSEN ---
         function loadKitchenStatusUI() {
             let status = getEffectiveKitchenStatus();
-            
             localStorage.setItem('borgo_kitchen_open', status.isOpen ? 'true' : 'false');
 
             let dot = document.getElementById('kitchenDot');
@@ -699,38 +927,21 @@
 
             if (status.isOpen) {
                 if (dot) dot.className = "w-3 h-3 rounded-full bg-green-500 inline-block animate-pulse";
-                if (text) { 
-                    text.innerText = status.override === 'open' ? "Open voor bestellingen (Handmatig)" : "Open voor bestellingen"; 
-                    text.className = "text-xl font-serif text-green-600 font-bold"; 
-                }
-                if (sub) {
-                    sub.innerText = status.override === 'open' ? "Handmatig geopend tot de eerstvolgende sluitingstijd." : "De keuken is geopend volgens de openingstijden.";
-                }
-                if (btn) { 
-                    btn.innerText = "Zet op Gesloten"; 
-                    btn.className = "bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition"; 
-                }
+                if (text) { text.innerText = status.override === 'open' ? "Open voor bestellingen (Handmatig)" : "Open voor bestellingen"; text.className = "text-xl font-serif text-green-600 font-bold"; }
+                if (sub) sub.innerText = status.override === 'open' ? "Handmatig geopend tot de eerstvolgende sluitingstijd." : "De keuken is geopend volgens de openingstijden.";
+                if (btn) { btn.innerText = "Zet op Gesloten"; btn.className = "bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition"; }
             } else {
                 if (dot) dot.className = "w-3 h-3 rounded-full bg-red-500 inline-block";
-                if (text) { 
-                    if (status.vacation) {
-                        text.innerText = `Gesloten (Vakantie: ${status.vacationData.startDate} t/m ${status.vacationData.endDate})`;
-                    } else {
-                        text.innerText = status.override === 'closed' ? "Gesloten wegens drukte (Handmatig)" : "Gesloten (Buiten openingstijden)"; 
-                    }
-                    text.className = "text-xl font-serif text-red-600 font-bold"; 
+                if (text) {
+                    if (status.vacation) text.innerText = `Gesloten (Vakantie: ${status.vacationData.startDate} t/m ${status.vacationData.endDate})`;
+                    else text.innerText = status.override === 'closed' ? "Gesloten wegens drukte (Handmatig)" : "Gesloten (Buiten openingstijden)";
+                    text.className = "text-xl font-serif text-red-600 font-bold";
                 }
-                if (sub) {
-                    sub.innerText = status.vacation ? "Automatisch gesloten vanwege ingeplande vakantieperiode." : (status.override === 'closed' ? "Handmatig gesloten tot de eerstvolgende openingstijd." : "Online bestellen is tijdelijk uitgeschakeld.");
-                }
-                if (btn) { 
-                    btn.innerText = "Zet open"; 
-                    btn.className = "bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition"; 
-                }
+                if (sub) sub.innerText = status.vacation ? "Automatisch gesloten vanwege ingeplande vakantieperiode." : (status.override === 'closed' ? "Handmatig gesloten tot de eerstvolgende openingstijd." : "Online bestellen is tijdelijk uitgeschakeld.");
+                if (btn) { btn.innerText = "Zet open"; btn.className = "bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition"; }
             }
         }
 
-        // --- VAKANTIE BEHEER FUNCTIES (NIEUW) ---
         function loadVacationUI() {
             let vacations = JSON.parse(localStorage.getItem('borgo_vacations')) || defaultVacations;
             let html = '';
@@ -742,18 +953,11 @@
                     <tr class="hover:bg-stone-50 transition">
                         <td class="py-3 px-4 font-semibold text-stone-900">${vac.startDate}</td>
                         <td class="py-3 px-4 font-semibold text-stone-900">${vac.endDate}</td>
-                        <td class="py-3 px-4 text-center">
-                            <span class="px-3 py-1 rounded-full text-xs font-semibold ${isActive ? 'bg-red-100 text-red-700' : 'bg-stone-100 text-stone-600'}">
-                                ${isActive ? 'Nu Actief (Gesloten)' : 'Gepland'}
-                            </span>
-                        </td>
-                        <td class="py-3 px-4 text-center">
-                            <button onclick="deleteVacation(${vac.id})" class="text-red-500 hover:text-red-700 text-xs font-semibold bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition">Verwijder &times;</button>
-                        </td>
+                        <td class="py-3 px-4 text-center"><span class="px-3 py-1 rounded-full text-xs font-semibold ${isActive ? 'bg-red-100 text-red-700' : 'bg-stone-100 text-stone-600'}">${isActive ? 'Nu Actief (Gesloten)' : 'Gepland'}</span></td>
+                        <td class="py-3 px-4 text-center"><button onclick="deleteVacation(${vac.id})" class="text-red-500 hover:text-red-700 text-xs font-semibold bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition">Verwijder &times;</button></td>
                     </tr>
                 `;
             });
-
             let listElem = document.getElementById('vacationTableList');
             if (listElem) listElem.innerHTML = html || '<tr><td colspan="4" class="text-center py-6 text-stone-400">Geen vakanties ingepland.</td></tr>';
         }
@@ -762,19 +966,9 @@
             event.preventDefault();
             let start = document.getElementById('vacationStart').value;
             let end = document.getElementById('vacationEnd').value;
-
-            if (start > end) {
-                alert('✕ De startdatum kan niet na de einddatum liggen!');
-                return;
-            }
-
+            if (start > end) { alert('✕ De startdatum kan niet na de einddatum liggen!'); return; }
             let vacations = JSON.parse(localStorage.getItem('borgo_vacations')) || defaultVacations;
-            vacations.push({
-                id: Date.now(),
-                startDate: start,
-                endDate: end
-            });
-
+            vacations.push({ id: Date.now(), startDate: start, endDate: end });
             localStorage.setItem('borgo_vacations', JSON.stringify(vacations));
             document.getElementById('vacationStart').value = '';
             document.getElementById('vacationEnd').value = '';
@@ -794,20 +988,15 @@
             }
         }
 
-        // Telt actieve codes en actieve bezorggebieden voor op het dashboard
         function updateDashboardCounts() {
             let discounts = JSON.parse(localStorage.getItem('borgo_discounts')) || defaultDiscounts;
             let countElem = document.getElementById('activeCodesCount');
-            if (countElem) {
-                countElem.innerText = discounts.length + " Codes Actief";
-            }
+            if (countElem) countElem.innerText = discounts.length + " Codes Actief";
 
             let areas = JSON.parse(localStorage.getItem('borgo_delivery_areas')) || defaultDeliveryAreas;
             let activeAreas = areas.filter(a => a.active).length;
             let areasElem = document.getElementById('activeAreasCount');
-            if (areasElem) {
-                areasElem.innerText = activeAreas + " Gebieden Actief";
-            }
+            if (areasElem) areasElem.innerText = activeAreas + " Gebieden Actief";
         }
 
         function loadCategories() {
@@ -819,30 +1008,23 @@
             cats.forEach(cat => {
                 selectHtml += `<option value="${cat}">${cat}</option>`;
                 navHtml += `<button onclick="filterMenu(\`${cat}\`)" class="px-4 py-2 rounded-xl text-xs font-semibold ${currentFilter === cat ? 'bg-amber-600 text-white' : 'bg-stone-100 text-stone-700'} whitespace-nowrap transition">${cat}</button>`;
-                
                 tableHtml += `
                     <tr class="hover:bg-stone-50 transition">
                         <td class="py-3 px-4 font-medium text-stone-900">${cat}</td>
-                        <td class="py-3 px-4 text-center">
-                            <button onclick="deleteCategory(\`${cat}\`)" class="text-red-500 hover:text-red-700 text-xs font-semibold bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition">Verwijder &times;</button>
-                        </td>
+                        <td class="py-3 px-4 text-center"><button onclick="deleteCategory(\`${cat}\`)" class="text-red-500 hover:text-red-700 text-xs font-semibold bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition">Verwijder &times;</button></td>
                     </tr>
                 `;
             });
 
-            let selectElem = document.getElementById('newItemCategory');
-            if (selectElem) selectElem.innerHTML = selectHtml;
-            let tableElem = document.getElementById('categoryTableList');
-            if (tableElem) tableElem.innerHTML = tableHtml;
-            let navElem = document.getElementById('categoryNavBar');
-            if (navElem) navElem.innerHTML = navHtml;
+            if (document.getElementById('newItemCategory')) document.getElementById('newItemCategory').innerHTML = selectHtml;
+            if (document.getElementById('categoryTableList')) document.getElementById('categoryTableList').innerHTML = tableHtml;
+            if (document.getElementById('categoryNavBar')) document.getElementById('categoryNavBar').innerHTML = navHtml;
         }
 
         function addNewCategory(event) {
             event.preventDefault();
             let newCat = document.getElementById('newCategoryInput').value.trim();
             let cats = JSON.parse(localStorage.getItem('borgo_categories')) || defaultCategories;
-
             if (!cats.includes(newCat)) {
                 cats.push(newCat);
                 localStorage.setItem('borgo_categories', JSON.stringify(cats));
@@ -855,25 +1037,19 @@
         }
 
         function deleteCategory(categoryName) {
-            if (confirm(`Weet je zeker dat je categorie "${categoryName}" wilt verwijderen? Alle artikelen in deze categorie worden ook automatisch verwijderd!`)) {
+            if (confirm(`Weet je zeker dat je categorie "${categoryName}" wilt verwijderen?`)) {
                 let cats = JSON.parse(localStorage.getItem('borgo_categories')) || defaultCategories;
                 cats = cats.filter(c => c !== categoryName);
                 localStorage.setItem('borgo_categories', JSON.stringify(cats));
-
-                let menu = JSON.parse(localStorage.getItem('borgo_menu_items')) || defaultMenuItems;
-                menu = menu.filter(item => item.category !== categoryName);
-                localStorage.setItem('borgo_menu_items', JSON.stringify(menu));
-
                 loadCategories();
                 loadAdminMenu(currentFilter);
-                alert(`✓ Categorie "${categoryName}" en alle bijbehorende artikelen zijn verwijderd.`);
+                alert(`✓ Categorie "${categoryName}" is verwijderd.`);
             }
         }
 
         function addNewItem(event) {
             event.preventDefault();
             let menu = JSON.parse(localStorage.getItem('borgo_menu_items')) || defaultMenuItems;
-
             let newItem = {
                 id: Date.now(),
                 name: document.getElementById('newItemName').value,
@@ -883,14 +1059,11 @@
                 btw: document.getElementById('newItemBtw').value,
                 soldOut: false
             };
-
             menu.push(newItem);
             localStorage.setItem('borgo_menu_items', JSON.stringify(menu));
-            
             document.getElementById('newItemName').value = '';
             document.getElementById('newItemIngredients').value = '';
             document.getElementById('newItemPrice').value = '';
-
             loadAdminMenu(currentFilter);
             alert('✓ Artikel succesvol toegevoegd aan het menu!');
         }
@@ -904,20 +1077,13 @@
         function loadAdminMenu(filter) {
             let menu = JSON.parse(localStorage.getItem('borgo_menu_items')) || defaultMenuItems;
             let html = '';
-
             menu.forEach((item, index) => {
                 if (filter !== 'Alles' && item.category !== filter) return;
-
                 html += `
                     <tr class="hover:bg-stone-50 transition">
-                        <td class="py-3 px-4">
-                            <p class="font-medium text-stone-900">${item.name}</p>
-                            <p class="text-xs text-stone-500">${item.ingredients || ''}</p>
-                        </td>
+                        <td class="py-3 px-4"><p class="font-medium text-stone-900">${item.name}</p><p class="text-xs text-stone-500">${item.ingredients || ''}</p></td>
                         <td class="py-3 px-4 text-stone-500">${item.category}</td>
-                        <td class="py-3 px-4">
-                            <input type="number" step="0.50" id="price_${index}" value="${item.price.toFixed(2)}" class="w-24 border border-stone-300 rounded-lg p-1.5 text-sm bg-white">
-                        </td>
+                        <td class="py-3 px-4"><input type="number" step="0.50" id="price_${index}" value="${item.price.toFixed(2)}" class="w-24 border border-stone-300 rounded-lg p-1.5 text-sm bg-white"></td>
                         <td class="py-3 px-4 text-center">
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" id="soldout_${index}" ${item.soldOut ? 'checked' : ''} class="sr-only peer">
@@ -925,14 +1091,11 @@
                                 <span class="ml-2 text-xs font-semibold text-stone-600">${item.soldOut ? 'Uitverkocht' : 'Beschikbaar'}</span>
                             </label>
                         </td>
-                        <td class="py-3 px-4 text-center">
-                            <button onclick="deleteMenuItem(${item.id})" class="text-red-500 hover:text-red-700 text-xs font-semibold bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition">Verwijder</button>
-                        </td>
+                        <td class="py-3 px-4 text-center"><button onclick="deleteMenuItem(${item.id})" class="text-red-500 hover:text-red-700 text-xs font-semibold bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition">Verwijder</button></td>
                     </tr>
                 `;
             });
-
-            document.getElementById('adminMenuList').innerHTML = html || '<tr><td colspan="5" class="text-center py-6 text-stone-400">Geen artikelen gevonden in deze categorie.</td></tr>';
+            document.getElementById('adminMenuList').innerHTML = html || '<tr><td colspan="5" class="text-center py-6 text-stone-400">Geen artikelen gevonden.</td></tr>';
         }
 
         function deleteMenuItem(id) {
@@ -947,7 +1110,6 @@
 
         function saveMenuChanges() {
             let menu = JSON.parse(localStorage.getItem('borgo_menu_items')) || defaultMenuItems;
-
             menu.forEach((item, index) => {
                 let priceInput = document.getElementById(`price_${index}`);
                 let soldOutInput = document.getElementById(`soldout_${index}`);
@@ -957,30 +1119,24 @@
                     item.soldOut = soldOutInput.checked;
                 }
             });
-
             localStorage.setItem('borgo_menu_items', JSON.stringify(menu));
             alert('✓ Alle prijzen en beschikbaarheid zijn succesvol opgeslagen!');
             loadAdminMenu(currentFilter);
         }
 
-        // --- KORTINGEN BEHEER FUNCTIES ---
         function loadAdminDiscounts() {
             let discounts = JSON.parse(localStorage.getItem('borgo_discounts')) || defaultDiscounts;
             let html = '';
-
             discounts.forEach(disc => {
                 html += `
                     <tr class="hover:bg-stone-50 transition">
                         <td class="py-3 px-4 font-medium text-stone-900">${disc.name}</td>
                         <td class="py-3 px-4"><code class="bg-stone-100 px-2.5 py-1 rounded border border-stone-200 font-mono font-bold text-amber-700">${disc.code}</code></td>
                         <td class="py-3 px-4 text-stone-600">${disc.type === 'percentage' ? disc.type + ' (' + disc.value + '%)' : 'Gratis item'}</td>
-                        <td class="py-3 px-4 text-center">
-                            <button onclick="deleteDiscount(${disc.id})" class="text-red-500 hover:text-red-700 text-xs font-semibold bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition">Stopzetten &times;</button>
-                        </td>
+                        <td class="py-3 px-4 text-center"><button onclick="deleteDiscount(${disc.id})" class="text-red-500 hover:text-red-700 text-xs font-semibold bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition">Stopzetten &times;</button></td>
                     </tr>
                 `;
             });
-
             document.getElementById('adminDiscountsList').innerHTML = html || '<tr><td colspan="4" class="text-center py-6 text-stone-400">Geen actieve acties gevonden.</td></tr>';
             updateDashboardCounts();
         }
@@ -988,7 +1144,6 @@
         function addNewDiscount(event) {
             event.preventDefault();
             let discounts = JSON.parse(localStorage.getItem('borgo_discounts')) || defaultDiscounts;
-
             let newDisc = {
                 id: Date.now(),
                 name: document.getElementById('newDiscName').value,
@@ -996,14 +1151,8 @@
                 type: document.getElementById('newDiscType').value,
                 value: document.getElementById('newDiscValue').value
             };
-
             discounts.push(newDisc);
             localStorage.setItem('borgo_discounts', JSON.stringify(discounts));
-
-            document.getElementById('newDiscName').value = '';
-            document.getElementById('newDiscCode').value = '';
-            document.getElementById('newDiscValue').value = '';
-
             alert('✓ Kortingscode succesvol toegevoegd en geactiveerd!');
             switchTab('kortingenOverzichtSection');
         }
@@ -1018,7 +1167,6 @@
             }
         }
 
-        // --- OPENINGSTIJDEN BEHEER FUNCTIES ---
         function generateTimeOptions(selectedTime) {
             let options = '';
             for (let h = 0; h < 24; h++) {
@@ -1036,7 +1184,6 @@
         function loadOpeningHoursUI() {
             let hours = JSON.parse(localStorage.getItem('borgo_opening_hours')) || defaultOpeningHours;
             let html = '';
-
             hours.forEach((item, index) => {
                 html += `
                     <tr class="hover:bg-stone-50 transition">
@@ -1048,46 +1195,29 @@
                                 <span class="ml-2 text-xs font-semibold text-stone-600">${item.open ? 'Open' : 'Gesloten'}</span>
                             </label>
                         </td>
-                        <td class="py-3 px-4">
-                            <select id="oh_opentime_${index}" class="border border-stone-300 rounded-lg p-2 text-sm bg-white font-medium">
-                                ${generateTimeOptions(item.openTime)}
-                            </select>
-                        </td>
-                        <td class="py-3 px-4">
-                            <select id="oh_closetime_${index}" class="border border-stone-300 rounded-lg p-2 text-sm bg-white font-medium">
-                                ${generateTimeOptions(item.closeTime)}
-                            </select>
-                        </td>
+                        <td class="py-3 px-4"><select id="oh_opentime_${index}" class="border border-stone-300 rounded-lg p-2 text-sm bg-white font-medium">${generateTimeOptions(item.openTime)}</select></td>
+                        <td class="py-3 px-4"><select id="oh_closetime_${index}" class="border border-stone-300 rounded-lg p-2 text-sm bg-white font-medium">${generateTimeOptions(item.closeTime)}</select></td>
                     </tr>
                 `;
             });
-
             document.getElementById('openingHoursTableList').innerHTML = html;
         }
 
         function saveOpeningHours() {
             let hours = JSON.parse(localStorage.getItem('borgo_opening_hours')) || defaultOpeningHours;
-
             hours.forEach((item, index) => {
-                let isOpen = document.getElementById(`oh_open_${index}`).checked;
-                let openT = document.getElementById(`oh_opentime_${index}`).value;
-                let closeT = document.getElementById(`oh_closetime_${index}`).value;
-
-                item.open = isOpen;
-                item.openTime = openT;
-                item.closeTime = closeT;
+                item.open = document.getElementById(`oh_open_${index}`).checked;
+                item.openTime = document.getElementById(`oh_opentime_${index}`).value;
+                item.closeTime = document.getElementById(`oh_closetime_${index}`).value;
             });
-
             localStorage.setItem('borgo_opening_hours', JSON.stringify(hours));
             alert('✓ Openingstijden succesvol opgeslagen!');
             loadKitchenStatusUI();
         }
 
-        // --- BEZORGGEBIEDEN BEHEER FUNCTIES ---
         function loadDeliveryAreasUI() {
             let areas = JSON.parse(localStorage.getItem('borgo_delivery_areas')) || defaultDeliveryAreas;
             let html = '';
-
             areas.forEach((area, index) => {
                 html += `
                     <tr class="hover:bg-stone-50 transition">
@@ -1100,33 +1230,25 @@
                                 <span class="ml-2 text-xs font-semibold text-stone-600">${area.active ? 'Aan' : 'Uit'}</span>
                             </label>
                         </td>
-                        <td class="py-3 px-4 text-center">
-                            <button onclick="deleteDeliveryArea(${area.id})" class="text-red-500 hover:text-red-700 text-xs font-semibold bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition">Verwijder &times;</button>
-                        </td>
+                        <td class="py-3 px-4 text-center"><button onclick="deleteDeliveryArea(${area.id})" class="text-red-500 hover:text-red-700 text-xs font-semibold bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition">Verwijder &times;</button></td>
                     </tr>
                 `;
             });
-
-            document.getElementById('deliveryAreasTableList').innerHTML = html || '<tr><td colspan="4" class="text-center py-6 text-stone-400">Geen bezorggebieden ingesteld.</td></tr>';
+            document.getElementById('deliveryAreasTableList').innerHTML = html || '<tr><td colspan="4" class="text-center py-6 text-stone-400">Geen bezorggebieden.</td></tr>';
         }
 
         function addNewDeliveryArea(event) {
             event.preventDefault();
             let areas = JSON.parse(localStorage.getItem('borgo_delivery_areas')) || defaultDeliveryAreas;
-
-            let newArea = {
+            areas.push({
                 id: Date.now(),
                 name: document.getElementById('newAreaName').value.trim(),
                 zips: document.getElementById('newAreaZip').value.trim(),
                 active: true
-            };
-
-            areas.push(newArea);
+            });
             localStorage.setItem('borgo_delivery_areas', JSON.stringify(areas));
-
             document.getElementById('newAreaName').value = '';
             document.getElementById('newAreaZip').value = '';
-
             loadDeliveryAreasUI();
             updateDashboardCounts();
             alert('✓ Bezorggebied succesvol toegevoegd!');
@@ -1145,12 +1267,9 @@
 
         function saveDeliveryAreas() {
             let areas = JSON.parse(localStorage.getItem('borgo_delivery_areas')) || defaultDeliveryAreas;
-
             areas.forEach((area, index) => {
-                let isActive = document.getElementById(`area_active_${index}`).checked;
-                area.active = isActive;
+                area.active = document.getElementById(`area_active_${index}`).checked;
             });
-
             localStorage.setItem('borgo_delivery_areas', JSON.stringify(areas));
             updateDashboardCounts();
             alert('✓ Status van bezorggebieden succesvol opgeslagen!');
