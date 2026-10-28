@@ -95,23 +95,12 @@
         const CORRECT_PIN = "1234";
         let activeTab = 'bestellingen';
 
-        // Automatische dagelijkse opschoning: check of het een nieuwe dag is voor het keukenscherm
-        const todayDateStr = new Date().toDateString();
-        const lastScreenDate = localStorage.getItem('borgo_last_screen_date');
-
+        // Laad alle bestellingen uit localStorage (blijft permanent bewaard voor admin.html)
         let orders = (JSON.parse(localStorage.getItem('borgo_orders')) || []).map(order => ({
             ...order,
             orderTime: new Date(order.orderTime),
             deliveryDate: order.deliveryDate ? new Date(order.deliveryDate) : new Date()
         }));
-
-        // Als het een nieuwe dag is, filteren we afgeronde orders weg van het actieve keukenscherm 
-        // (ze blijven wel netjes bewaard in localStorage voor de admin-rapporten!)
-        if (lastScreenDate !== todayDateStr) {
-            orders = orders.filter(o => o.status !== 'afgerond');
-            localStorage.setItem('borgo_orders', JSON.stringify(orders));
-            localStorage.setItem('borgo_last_screen_date', todayDateStr);
-        }
 
         // Functie om wijzigingen direct op te slaan in localStorage én te herrenderen
         function saveAndRender() {
@@ -202,8 +191,14 @@
                 let category = 'bestellingen';
 
                 if (order.status === 'afgerond') {
-                    category = 'afgerond';
-                    afgerondCount++;
+                    // Belangrijk: Oude afgeronde bestellingen (van eerdere dagen) verbergen we van de tablet,
+                    // zodat het keukenscherm 's ochtends leeg is. Maar ze blijven wel in localStorage staan voor admin.html!
+                    if (!isToday(order.deliveryDate)) {
+                        category = 'historie'; // Valt buiten de 4 keukentabbladen
+                    } else {
+                        category = 'afgerond';
+                        afgerondCount++;
+                    }
                 } else if (isFutureDate(order.deliveryDate)) {
                     category = 'vooruitbesteld';
                     vooruitbesteldCount++;
