@@ -95,12 +95,23 @@
         const CORRECT_PIN = "1234";
         let activeTab = 'bestellingen';
 
-        // Laad echte bestellingen vanuit de browser-opslag (localStorage) en herstel Date-objecten
+        // Automatische dagelijkse opschoning: check of het een nieuwe dag is voor het keukenscherm
+        const todayDateStr = new Date().toDateString();
+        const lastScreenDate = localStorage.getItem('borgo_last_screen_date');
+
         let orders = (JSON.parse(localStorage.getItem('borgo_orders')) || []).map(order => ({
             ...order,
             orderTime: new Date(order.orderTime),
             deliveryDate: order.deliveryDate ? new Date(order.deliveryDate) : new Date()
-        }));        
+        }));
+
+        // Als het een nieuwe dag is, filteren we afgeronde orders weg van het actieve keukenscherm 
+        // (ze blijven wel netjes bewaard in localStorage voor de admin-rapporten!)
+        if (lastScreenDate !== todayDateStr) {
+            orders = orders.filter(o => o.status !== 'afgerond');
+            localStorage.setItem('borgo_orders', JSON.stringify(orders));
+            localStorage.setItem('borgo_last_screen_date', todayDateStr);
+        }
 
         // Functie om wijzigingen direct op te slaan in localStorage én te herrenderen
         function saveAndRender() {
@@ -323,9 +334,9 @@
             if(order) {
                 order.expanded = !order.expanded;
                 if(order.expanded && order.isNew) {
-                    order.isNew = false; // Zodra je hem openklapt, verdwijnt 'NEW' definitief
+                    order.isNew = false;
                 }
-                saveAndRender(); // Slaat direct op in localStorage!
+                saveAndRender();
             }
         }
 
@@ -353,7 +364,7 @@
                 order.status = 'afgerond';
                 order.expanded = false;
                 order.isNew = false;
-                saveAndRender(); // Slaat op en ververst het scherm (verdwijnt uit actieve lijsten, komt bij Afgerond)
+                saveAndRender(); 
                 scheduleReviewEmail(order);
             }
         }
