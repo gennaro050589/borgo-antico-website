@@ -49,7 +49,7 @@
                     <h1 class="font-bold text-lg leading-none">Borgo Antico Keukenscherm</h1>
                     <span class="text-xs text-emerald-400 flex items-center mt-1">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block mr-1.5 animate-pulse"></span>
-                        Live verbonden met onlinebestellen
+                        Live verbonden (Automatische synchronisatie actief)
                     </span>
                 </div>
             </div>
@@ -95,14 +95,19 @@
         const CORRECT_PIN = "1234";
         let activeTab = 'bestellingen';
 
-        // Laad alle bestellingen uit localStorage (blijft permanent bewaard voor admin.html)
-        let orders = (JSON.parse(localStorage.getItem('borgo_orders')) || []).map(order => ({
-            ...order,
-            orderTime: new Date(order.orderTime),
-            deliveryDate: order.deliveryDate ? new Date(order.deliveryDate) : new Date()
-        }));
+        let orders = [];
 
-        // Functie om wijzigingen direct op te slaan in localStorage én te herrenderen
+        // Functie om bestellingen in te laden uit localStorage
+        function loadOrdersFromStorage() {
+            const rawOrders = JSON.parse(localStorage.getItem('borgo_orders')) || [];
+            orders = rawOrders.map(order => ({
+                ...order,
+                orderTime: new Date(order.orderTime),
+                deliveryDate: order.deliveryDate ? new Date(order.deliveryDate) : new Date()
+            }));
+        }
+
+        // Sla op in localStorage en herrender
         function saveAndRender() {
             localStorage.setItem('borgo_orders', JSON.stringify(orders));
             renderOrders();
@@ -118,6 +123,7 @@
                 document.getElementById('login-modal').classList.add('hidden');
                 document.getElementById('app-container').classList.remove('hidden');
                 startClock();
+                loadOrdersFromStorage();
                 renderOrders();
             } else {
                 document.getElementById('login-error').classList.remove('hidden');
@@ -125,10 +131,18 @@
         }
 
         function startClock() {
+            // Elke seconde de klok bijwerken én elke 3 seconden automatisch controleren op nieuwe bestellingen
+            let counter = 0;
             setInterval(() => {
                 const now = new Date();
                 document.getElementById('live-clock').innerText = now.toLocaleTimeString('nl-NL');
-                renderOrders();
+                
+                counter++;
+                if (counter >= 3) { // Elke 3 seconden
+                    counter = 0;
+                    loadOrdersFromStorage();
+                    renderOrders();
+                }
             }, 1000);
         }
 
@@ -191,10 +205,9 @@
                 let category = 'bestellingen';
 
                 if (order.status === 'afgerond') {
-                    // Belangrijk: Oude afgeronde bestellingen (van eerdere dagen) verbergen we van de tablet,
-                    // zodat het keukenscherm 's ochtends leeg is. Maar ze blijven wel in localStorage staan voor admin.html!
+                    // Oude afgeronde bestellingen van eerdere dagen verbergen we van de keukentablet
                     if (!isToday(order.deliveryDate)) {
-                        category = 'historie'; // Valt buiten de 4 keukentabbladen
+                        category = 'historie';
                     } else {
                         category = 'afgerond';
                         afgerondCount++;
@@ -395,6 +408,7 @@
             console.log(`[MAIL 3 - REVIEW GEPLAND]`);
         }
 
+        loadOrdersFromStorage();
         renderOrders();
     </script>
 </body>
