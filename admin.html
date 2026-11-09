@@ -6,11 +6,14 @@
     <title>Beheerdersomgeving (Back-office) – Borgo Antico</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase SDKs (Compat-versie voor lokale en online werking) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
 <body class="bg-stone-100 text-stone-800 font-sans">
 
     <!-- ================================================================= -->
-    <!-- HOOFDSTUK 1: HTML BASIS, LAYOUT, STYLING & INLOGSCHERM          -->
+    <!-- HOOFDSTUK 1: HTML BASIS, LAYOUT, STYLING & INLOGSCHERM             -->
     <!-- ================================================================= -->
 
     <!-- BEHEERDER INLOGSCHERM -->
@@ -185,7 +188,7 @@
             </div>
 
             <!-- ================================================================= -->
-            <!-- HOOFDSTUK 3: MENUBEHEER, ARTIKELEN & CATEGORIEËN                 -->
+            <!-- HOOFDSTUK 2: MENUBEHEER, ARTIKELEN & CATEGORIEËN                   -->
             <!-- ================================================================= -->
 
             <!-- 1. MENUBEHEER & VOORRAAD -->
@@ -289,7 +292,7 @@
             </div>
 
             <!-- ================================================================= -->
-            <!-- HOOFDSTUK 4: KORTINGSCODES & BEZORGGEBIEDEN                     -->
+            <!-- HOOFDSTUK 3: KORTINGSCODES & BEZORGGEBIEDEN                       -->
             <!-- ================================================================= -->
 
             <!-- 4A. KORTINGEN - OVERZICHT -->
@@ -350,6 +353,73 @@
 
                     <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3.5 rounded-xl transition text-sm shadow-md mt-4">Kortingscode opslaan en activeren</button>
                 </form>
+            </div>
+
+            <!-- ================================================================= -->
+            <!-- HOOFDSTUK 4: OPENINGSTIJDEN & VAKANTIES                           -->
+            <!-- ================================================================= -->
+
+            <!-- 5A. REGULIERE TIJDEN -->
+            <div id="openingstijdenSection" class="admin-section hidden bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
+                <div class="flex justify-between items-center border-b border-stone-100 pb-4">
+                    <div>
+                        <h2 class="text-2xl font-serif text-stone-900">Reguliere Openingstijden</h2>
+                        <p class="text-stone-500 text-sm">Stel per dag in of de keuken open is en wat de openingstijden zijn.</p>
+                    </div>
+                    <button onclick="saveOpeningHours()" class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition shadow-md">Wijzigingen opslaan</button>
+                </div>
+
+                <div class="overflow-x-auto border border-stone-200 rounded-xl">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-stone-200 bg-stone-50 text-xs uppercase tracking-wider text-stone-500">
+                                <th class="py-3 px-4">Dag</th>
+                                <th class="py-3 px-4">Status</th>
+                                <th class="py-3 px-4">Open Tijd</th>
+                                <th class="py-3 px-4">Sluit Tijd</th>
+                            </tr>
+                        </thead>
+                        <tbody id="openingHoursTableList" class="divide-y divide-stone-100 text-sm">
+                            <!-- Dynamisch -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 5B. VAKANTIE TOEVOEGEN -->
+            <div id="vakantieSection" class="admin-section hidden bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
+                <div class="border-b border-stone-100 pb-4">
+                    <h2 class="text-2xl font-serif text-stone-900">Vakantieperiodes Beheren</h2>
+                    <p class="text-stone-500 text-sm">Plan vakanties in waarin de keuken automatisch gesloten is.</p>
+                </div>
+
+                <form onsubmit="addNewVacation(event)" class="flex gap-4 items-end bg-stone-50 p-4 rounded-xl border border-stone-200">
+                    <div class="flex-1">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Startdatum</label>
+                        <input type="date" id="vacationStart" required class="w-full border border-stone-300 rounded-xl p-3 text-sm bg-white focus:outline-none focus:border-amber-600">
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Einddatum</label>
+                        <input type="date" id="vacationEnd" required class="w-full border border-stone-300 rounded-xl p-3 text-sm bg-white focus:outline-none focus:border-amber-600">
+                    </div>
+                    <button type="submit" class="bg-stone-900 hover:bg-stone-800 text-white px-5 py-3 rounded-xl text-sm font-semibold transition">Vakantie inplannen</button>
+                </form>
+
+                <div class="overflow-x-auto border border-stone-200 rounded-xl">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-stone-200 bg-stone-50 text-xs uppercase tracking-wider text-stone-500">
+                                <th class="py-3 px-4">Startdatum</th>
+                                <th class="py-3 px-4">Einddatum</th>
+                                <th class="py-3 px-4 text-center">Status</th>
+                                <th class="py-3 px-4 text-center">Actie</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vacationTableList" class="divide-y divide-stone-100 text-sm">
+                            <!-- Dynamisch -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- 6. BEZORGGEBIEDEN BEHEER -->
@@ -464,7 +534,7 @@
                         </div>
                     </div>
 
-                    <!-- Export Acties (Alleen PDF en CSV) -->
+                    <!-- Export Acties -->
                     <div class="pt-6 border-t border-stone-800 flex flex-wrap gap-3 justify-end font-sans">
                         <button onclick="alert('Rapport is opgeslagen als PDF.')" class="bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs px-4 py-2.5 rounded-xl font-medium transition border border-stone-700">📄 Opslaan als PDF</button>
                         <button onclick="exportReportCSV()" class="bg-amber-600 hover:bg-amber-500 text-white text-xs px-4 py-2.5 rounded-xl font-semibold transition shadow-md">📊 Export naar Excel (CSV)</button>
@@ -503,9 +573,45 @@
 
     <!-- JavaScript Logica -->
     <script>
-        // -----------------------------------------------------------------
-        // HOOFDSTUK 2: DASHBOARD & KEUKENBEHEER (OPENINGSTIJDEN & VAKANTIES)
-        // -----------------------------------------------------------------
+        // ==========================================
+        // FIREBASE CONFIGURATIE & KOPPELING
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyAw15iv-MQgJ81Lb489lAtzu2I_8flLrfo",
+            authDomain: "borgo-antico-website.firebaseapp.com",
+            projectId: "borgo-antico-website",
+            storageBucket: "borgo-antico-website.firebasestorage.app",
+            messagingSenderId: "93359301533",
+            appId: "1:93359301533:web:dddcec172594d5f89c574"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Functie om de keukenstatus direct naar Firebase te schrijven
+        async function syncKitchenStatusToFirebase(isOpen, overrideType) {
+            try {
+                await db.collection("settings").doc("kitchen").set({
+                    isOpen: isOpen,
+                    override: overrideType || null,
+                    updatedAt: new Date().toISOString()
+                }, { merge: true });
+            } catch (err) {
+                console.error("Fout bij synchroniseren keukenstatus naar Firebase:", err);
+            }
+        }
+
+        // Functie om het menu en voorraad naar Firebase te schrijven
+        async function syncMenuToFirebase(menuItems) {
+            try {
+                await db.collection("settings").doc("menu").set({
+                    items: menuItems,
+                    updatedAt: new Date().toISOString()
+                }, { merge: true });
+            } catch (err) {
+                console.error("Fout bij synchroniseren menu naar Firebase:", err);
+            }
+        }
+
         let defaultCategories = ["Voorgerechten", "Pizza's", "Dessert", "Drinken", "Alcohol"];
         let defaultMenuItems = [
             { id: 1, name: 'Carpaccio', ingredients: 'Klassieke rundercarpaccio met rucola en parmezaanse kaas', category: 'Voorgerechten', price: 15.00, btw: '9', soldOut: false },
@@ -576,7 +682,11 @@
             let sections = document.querySelectorAll('.admin-section');
             sections.forEach(sec => sec.classList.add('hidden'));
             
-            document.getElementById(sectionId).classList.remove('hidden');
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+            }
+
             if (sectionId === 'menuSection') {
                 loadCategories();
                 loadAdminMenu(currentFilter);
@@ -620,9 +730,6 @@
             location.reload();
         }
 
-        // -----------------------------------------------------------------
-        // HOOFDSTUK 5: ANALYTICS, FINANCIËLE RAPPORTEN & STATISTIEKEN
-        // -----------------------------------------------------------------
         function toggleReportPeriodInput() {
             const type = document.getElementById('reportType').value;
             const dateInput = document.getElementById('reportDateInput');
@@ -814,7 +921,6 @@
             document.getElementById('topItemsList').innerHTML = html || '<p class="text-stone-400 text-xs">Nog geen bestellingsegevens beschikbaar.</p>';
         }
 
-        // --- KITCHEN & OTHER STANDARD ADMIN FUNCTIONS ---
         function checkCurrentTimeSlot() {
             let now = new Date();
             let todayStr = now.toISOString().split('T')[0];
@@ -902,18 +1008,24 @@
         function toggleKitchenStatus() {
             let status = getEffectiveKitchenStatus();
             let now = new Date();
+            let newIsOpen, newOverride;
             if (status.isOpen) {
                 let nextOpen = getNextOpenTime(now);
                 localStorage.setItem('borgo_manual_override', 'closed');
                 localStorage.setItem('borgo_override_expiry', nextOpen.date.getTime().toString());
                 alert(`⚠️ De keuken is handmatig gesloten!\n\nDe keuken gaat automatisch weer open op ${nextOpen.text}.`);
+                newIsOpen = false;
+                newOverride = 'closed';
             } else {
                 let nextClose = getNextCloseTime(now);
                 localStorage.setItem('borgo_manual_override', 'open');
                 localStorage.setItem('borgo_override_expiry', nextClose.date.getTime().toString());
                 alert(`🟢 De keuken is handmatig geopend!\n\nDe keuken sluit automatisch weer op ${nextClose.text}.`);
+                newIsOpen = true;
+                newOverride = 'open';
             }
             loadKitchenStatusUI();
+            syncKitchenStatusToFirebase(newIsOpen, newOverride);
         }
 
         function loadKitchenStatusUI() {
@@ -1061,6 +1173,7 @@
             };
             menu.push(newItem);
             localStorage.setItem('borgo_menu_items', JSON.stringify(menu));
+            syncMenuToFirebase(menu);
             document.getElementById('newItemName').value = '';
             document.getElementById('newItemIngredients').value = '';
             document.getElementById('newItemPrice').value = '';
@@ -1103,6 +1216,7 @@
                 let menu = JSON.parse(localStorage.getItem('borgo_menu_items')) || defaultMenuItems;
                 menu = menu.filter(item => item.id !== id);
                 localStorage.setItem('borgo_menu_items', JSON.stringify(menu));
+                syncMenuToFirebase(menu);
                 loadAdminMenu(currentFilter);
                 alert('✓ Artikel is verwijderd.');
             }
@@ -1120,6 +1234,7 @@
                 }
             });
             localStorage.setItem('borgo_menu_items', JSON.stringify(menu));
+            syncMenuToFirebase(menu);
             alert('✓ Alle prijzen en beschikbaarheid zijn succesvol opgeslagen!');
             loadAdminMenu(currentFilter);
         }

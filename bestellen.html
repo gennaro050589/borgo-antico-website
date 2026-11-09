@@ -6,15 +6,19 @@
     <title>Online Bestellen (Afhalen & Bezorgen) – Borgo Antico Zevenhuizen</title>
     <!-- Tailwind CSS voor strakke en snelle opmaak -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Firebase SDKs (Compat-versie zodat het ook lokaal werkt) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
 <body class="bg-stone-50 text-stone-800 font-sans">
 
-    <!-- Melding als keuken gesloten is (Gekoppeld aan admin.html) -->
+    <!-- Melding als keuken gesloten is -->
     <div id="kitchenClosedBanner" class="hidden bg-red-600 text-white text-center py-3 px-4 font-semibold text-sm">
         ⚠️ De keuken is momenteel gesloten voor online bestellingen. U kunt wel alvast een bestelling inplannen voor een latere dag!
     </div>
 
-    <!-- Navigatiebalk (Sticky bovenaan de pagina) -->
+    <!-- Navigatiebalk -->
     <header class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-stone-200">
         <div class="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
             <a href="index.html" class="text-2xl font-serif tracking-wide text-stone-900">BORGO ANTICO</a>
@@ -27,19 +31,17 @@
             <div class="flex items-center gap-3">
                 <a href="bestellen.html" class="bg-amber-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium shadow-sm">Bestellen</a>
                 <a href="contact.html" class="bg-stone-900 hover:bg-stone-800 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm">Reserveren</a>
-                <a href="admin.html" id="accountNavBtn" class="bg-stone-800 hover:bg-stone-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm border border-amber-600/50">Inloggen</a>
+                <a href="account.html" id="accountNavBtn" class="bg-stone-800 hover:bg-stone-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm border border-amber-600/50">Inloggen</a>
             </div>
         </div>
     </header>
 
-    <!-- Pagina Titel & Status Blok in Zwarte Balk -->
+    <!-- Pagina Titel & Status Blok -->
     <section class="bg-stone-900 text-white py-12 px-6">
         <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
             <div class="text-center md:text-left">
                 <h1 class="text-4xl font-serif">Online Bestellen</h1>
             </div>
-
-            <!-- Keuken Status Widget rechts in zwarte balk -->
             <div id="frontKitchenBox" class="bg-stone-800 border border-stone-700 p-3.5 rounded-2xl shadow-lg flex items-center gap-3 text-left max-w-xs w-full">
                 <span id="frontKitchenDot" class="w-3 h-3 rounded-full bg-green-500 inline-block shrink-0"></span>
                 <div>
@@ -50,11 +52,9 @@
         </div>
     </section>
 
-    <!-- Sticky Blok: Grote knoppen links, winkelmand rechts -->
+    <!-- Sticky Blok: Knoppen & Winkelmand -->
     <div class="sticky top-20 z-40 shadow-sm bg-white border-b border-stone-200">
         <div class="max-w-6xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
-            
-            <!-- Knoppen Bezorgen / Afhalen -->
             <div class="flex gap-3 w-full md:w-auto">
                 <button id="btnBezorgen" onclick="setOrderType('bezorgen')" class="flex-1 md:flex-initial px-6 py-3 rounded-xl font-semibold text-base transition border border-stone-300 bg-amber-600 text-white shadow-sm flex items-center justify-center gap-2">
                     🚗 Bezorgen
@@ -63,8 +63,6 @@
                     🛍️ Afhalen
                 </button>
             </div>
-
-            <!-- Winkelmand Knop -->
             <div>
                 <button onclick="toggleCartModal()" class="bg-stone-900 hover:bg-stone-800 text-white px-5 py-3 rounded-xl font-semibold text-sm transition shadow-md flex items-center gap-3 border border-stone-800">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -75,89 +73,73 @@
                     <span id="cartTotal" class="text-amber-400 font-bold">€ 0,00</span>
                 </button>
             </div>
-
         </div>
-
-        <!-- Categorie Navigatie Balk -->
         <nav class="bg-stone-100 border-t border-stone-200 py-3 px-6 overflow-x-auto">
             <div id="categoryNavLinks" class="max-w-5xl mx-auto flex gap-8 text-sm font-medium uppercase tracking-wider whitespace-nowrap justify-start md:justify-center text-stone-600">
-                <!-- Dynamische categorie links -->
             </div>
         </nav>
     </div>
 
     <!-- Hoofdinhoud Menukaart -->
     <main id="dynamicMenuContainer" class="max-w-4xl mx-auto px-6 py-12 space-y-16">
-        <!-- Dynamische gerechten per categorie -->
     </main>
 
-    <!-- POP-UP / MODAL VOOR GERECHT TOEVOEGEN -->
+    <!-- POP-UP / MODAL VOOR GERECHT -->
     <div id="itemModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl relative animate-in fade-in zoom-in duration-200">
+        <div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl relative">
             <button onclick="closeModal()" class="absolute top-4 right-4 text-stone-400 hover:text-stone-700 w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center font-bold text-lg">&times;</button>
-            
             <h3 id="modalItemName" class="text-2xl font-serif text-stone-900 mb-1">Gerecht</h3>
             <p id="modalItemPrice" class="text-amber-700 font-serif font-bold text-lg mb-6">€ 0,00</p>
-
             <div class="flex items-center justify-between mb-6 bg-stone-50 p-4 rounded-xl border border-stone-200">
                 <span class="font-medium text-stone-700 text-sm">Aantal</span>
                 <div class="flex items-center gap-4">
-                    <button onclick="changeQuantity(-1)" class="w-10 h-10 rounded-full bg-white border border-stone-300 text-stone-800 font-bold hover:bg-stone-100 shadow-sm flex items-center justify-center text-lg">-</button>
+                    <button onclick="changeQuantity(-1)" class="w-10 h-10 rounded-full bg-white border border-stone-300 text-stone-800 font-bold hover:bg-stone-100 flex items-center justify-center text-lg">-</button>
                     <span id="modalQuantity" class="font-bold text-lg w-6 text-center">1</span>
-                    <button onclick="changeQuantity(1)" class="w-10 h-10 rounded-full bg-amber-600 text-white font-bold hover:bg-amber-700 shadow-sm flex items-center justify-center text-lg">+</button>
+                    <button onclick="changeQuantity(1)" class="w-10 h-10 rounded-full bg-amber-600 text-white font-bold hover:bg-amber-700 flex items-center justify-center text-lg">+</button>
                 </div>
             </div>
-
             <div class="mb-6">
                 <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-2">Opmerking / Wensen voor de keuken</label>
                 <input type="text" id="modalNote" placeholder="Bijv. geen ui, extra warm..." class="w-full border border-stone-300 rounded-xl p-3 text-sm focus:outline-none focus:border-amber-600 bg-stone-50">
             </div>
-
             <div class="flex gap-3">
-                <button onclick="closeModal()" class="flex-1 bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold py-3.5 rounded-xl transition text-sm">Annuleren</button>
-                <button onclick="addToCartFromModal()" class="flex-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3.5 px-6 rounded-xl transition text-sm shadow-md">Toevoegen aan winkelwagen</button>
+                <button onclick="closeModal()" class="flex-1 bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold py-3.5 rounded-xl text-sm">Annuleren</button>
+                <button onclick="addToCartFromModal()" class="flex-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3.5 px-6 rounded-xl text-sm shadow-md">Toevoegen aan winkelwagen</button>
             </div>
         </div>
     </div>
 
-    <!-- WINKELWAGEN & AFREKENEN OVERZICHT MODAL (2 STAPPEN) -->
+    <!-- WINKELWAGEN & AFREKENEN MODAL -->
     <div id="cartModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-lg rounded-2xl p-6 shadow-2xl relative max-h-[90vh] flex flex-col">
             <button onclick="toggleCartModal()" class="absolute top-4 right-4 text-stone-400 hover:text-stone-700 w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center font-bold text-lg">&times;</button>
             
-            <!-- STAP 1: BESTELLING CHECK & GEWENSTE TIJD / DATUM -->
             <div id="cartStepView" class="flex-1 overflow-y-auto pr-1">
-                
-                <!-- Bovenkant: Titel "Bestelling" links en netjes uitgelijnd Bezorgen/Afhalen label -->
                 <div class="flex items-center justify-between mb-4 pr-8">
                     <h3 class="text-2xl font-serif text-stone-900">Bestelling</h3>
                     <span id="modalOrderTypeBadge" class="bg-amber-100 text-amber-800 text-xs font-bold px-3.5 py-1.5 rounded-xl uppercase tracking-wider border border-amber-300">Bezorgen</span>
                 </div>
                 
-                <!-- Gewenste Datum & Tijd -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-amber-50/50 p-3.5 rounded-xl border border-amber-200 mb-4">
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider text-amber-900 mb-1">Gewenste Datum</label>
-                        <input type="date" id="custDate" onchange="populateTimeSlots()" required class="w-full border border-stone-300 rounded-xl p-2.5 text-sm focus:outline-none focus:border-amber-600 bg-white">
+                        <input type="date" id="custDate" onchange="populateTimeSlots()" required class="w-full border border-stone-300 rounded-xl p-2.5 text-sm bg-white">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider text-amber-900 mb-1">Gewenste Tijd</label>
-                        <select id="custTime" required class="w-full border border-stone-300 rounded-xl p-2.5 text-sm focus:outline-none focus:border-amber-600 bg-white font-medium">
-                            <option value="Zo snel mogelijk">🚀 Zo snel mogelijk (ca. 30 min)</option>
+                        <select id="custTime" required class="w-full border border-stone-300 rounded-xl p-2.5 text-sm bg-white font-medium">
                         </select>
                     </div>
                 </div>
 
                 <div id="cartItemsList" class="max-h-48 overflow-y-auto divide-y divide-stone-100 mb-4 space-y-3">
-                    <!-- Wordt dynamisch gevuld -->
                 </div>
 
-                <!-- KORTINGSCODE BALK -->
                 <div class="bg-stone-50 p-4 rounded-xl border border-stone-200 mb-4">
                     <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-2">Heb je een kortingscode?</label>
                     <div class="flex gap-2">
-                        <input type="text" id="discountInput" placeholder="Bijv. MAANDAG10" class="flex-1 border border-stone-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-600 bg-white uppercase font-mono font-bold">
-                        <button onclick="applyDiscount()" class="bg-stone-900 hover:bg-stone-800 text-white px-4 py-2 rounded-xl text-sm font-semibold transition">Toepassen</button>
+                        <input type="text" id="discountInput" placeholder="Bijv. MAANDAG10" class="flex-1 border border-stone-300 rounded-xl px-3 py-2 text-sm uppercase font-mono font-bold bg-white">
+                        <button onclick="applyDiscount()" class="bg-stone-900 hover:bg-stone-800 text-white px-4 py-2 rounded-xl text-sm font-semibold">Toepassen</button>
                     </div>
                     <p id="discountMessage" class="text-xs mt-2 font-medium"></p>
                 </div>
@@ -170,90 +152,89 @@
                 </div>
 
                 <div class="flex gap-3">
-                    <button onclick="toggleCartModal()" class="flex-1 bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold py-3 rounded-xl transition text-sm">Verder winkelen</button>
-                    <button onclick="goToCheckout()" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3 rounded-xl transition text-sm shadow-md">Naar afrekenen</button>
+                    <button onclick="toggleCartModal()" class="flex-1 bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold py-3 rounded-xl text-sm">Verder winkelen</button>
+                    <button onclick="goToCheckout()" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3 rounded-xl text-sm shadow-md">Naar afrekenen</button>
                 </div>
             </div>
 
-            <!-- STAP 2: GEGEVENS & AFREKENEN FORMULIER -->
             <div id="checkoutStepView" class="hidden flex-1 overflow-y-auto pr-1">
                 <h3 class="text-2xl font-serif text-stone-900 mb-4">Gegevens & Afrekenen</h3>
-                
                 <form id="checkoutForm" onsubmit="submitOrder(event)" class="space-y-4">
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Naam</label>
-                        <input type="text" id="custName" required placeholder="Uw volledige naam" class="w-full border border-stone-300 rounded-xl p-3 text-sm focus:outline-none focus:border-amber-600 bg-stone-50">
+                        <input type="text" id="custName" required placeholder="Uw volledige naam" class="w-full border border-stone-300 rounded-xl p-3 text-sm bg-stone-50">
                     </div>
-
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">E-mailadres</label>
-                            <input type="email" id="custEmail" required placeholder="naam@voorbeeld.nl" class="w-full border border-stone-300 rounded-xl p-3 text-sm focus:outline-none focus:border-amber-600 bg-stone-50">
+                            <input type="email" id="custEmail" required placeholder="naam@voorbeeld.nl" class="w-full border border-stone-300 rounded-xl p-3 text-sm bg-stone-50">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Telefoonnummer</label>
-                            <input type="tel" id="custPhone" required placeholder="06-12345678" class="w-full border border-stone-300 rounded-xl p-3 text-sm focus:outline-none focus:border-amber-600 bg-stone-50">
+                            <input type="tel" id="custPhone" required placeholder="06-12345678" class="w-full border border-stone-300 rounded-xl p-3 text-sm bg-stone-50">
                         </div>
                     </div>
-
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Straat en huisnummer</label>
-                        <input type="text" id="custStreet" required placeholder="Dorpsstraat 1" class="w-full border border-stone-300 rounded-xl p-3 text-sm focus:outline-none focus:border-amber-600 bg-stone-50">
+                        <input type="text" id="custStreet" required placeholder="Dorpsstraat 1" class="w-full border border-stone-300 rounded-xl p-3 text-sm bg-stone-50">
                     </div>
-
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Postcode</label>
-                            <input type="text" id="custZip" required placeholder="2761 AA" class="w-full border border-stone-300 rounded-xl p-3 text-sm focus:outline-none focus:border-amber-600 bg-stone-50">
+                            <input type="text" id="custZip" required placeholder="2761 AA" class="w-full border border-stone-300 rounded-xl p-3 text-sm bg-stone-50">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Woonplaats</label>
-                            <input type="text" id="custCity" required value="Zevenhuizen" class="w-full border border-stone-300 rounded-xl p-3 text-sm focus:outline-none focus:border-amber-600 bg-stone-50">
+                            <input type="text" id="custCity" required value="Zevenhuizen" class="w-full border border-stone-300 rounded-xl p-3 text-sm bg-stone-50">
                         </div>
                     </div>
-
-                    <!-- Melding bij ongeldig of uitgeschakeld bezorggebied -->
                     <div id="deliveryErrorBox" class="hidden bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl text-xs font-semibold">
                         ⚠️ Vandaag bezorgen wij niet in dit gebied of is dit gebied uitgeschakeld. U kunt wel kiezen voor afhalen!
                     </div>
-
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Betaalwijze</label>
-                        <select id="custPayment" class="w-full border border-stone-300 rounded-xl p-3 text-sm focus:outline-none focus:border-amber-600 bg-stone-50 font-medium">
+                        <select id="custPayment" class="w-full border border-stone-300 rounded-xl p-3 text-sm bg-stone-50 font-medium">
                             <option value="Tikkie">Betaal via Tikkie (wij sturen een betaalverzoek)</option>
                             <option value="Contant">Contant bij afhalen / bezorgen</option>
                         </select>
                     </div>
-
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1">Opmerking voor de bezorger (optioneel)</label>
-                        <input type="text" id="custDriverNote" placeholder="Bijv. bel doet het niet, kloppen graag..." class="w-full border border-stone-300 rounded-xl p-3 text-sm focus:outline-none focus:border-amber-600 bg-stone-50">
+                        <input type="text" id="custDriverNote" placeholder="Bijv. bel doet het niet, kloppen graag..." class="w-full border border-stone-300 rounded-xl p-3 text-sm bg-stone-50">
                     </div>
-
-                    <!-- Vinkjes: Onthoud mijn gegevens & Algemene voorwaarden -->
                     <div class="space-y-2 pt-2 border-t border-stone-200">
                         <label class="flex items-center gap-2 text-xs font-medium text-stone-700 cursor-pointer">
-                            <input type="checkbox" id="rememberMeCheck" class="rounded border-stone-300 text-amber-600 focus:ring-amber-500 w-4 h-4">
+                            <input type="checkbox" id="rememberMeCheck" class="rounded border-stone-300 text-amber-600 w-4 h-4">
                             <span>Onthoud mijn gegevens voor een volgende keer</span>
                         </label>
                         <label class="flex items-center gap-2 text-xs font-medium text-stone-700 cursor-pointer">
-                            <input type="checkbox" id="termsCheck" required class="rounded border-stone-300 text-amber-600 focus:ring-amber-500 w-4 h-4">
-                            <span>Ik ga akkoord met de <a href="#" class="text-amber-700 underline">algemene voorwaarden</a></span>
+                            <input type="checkbox" id="termsCheck" required class="rounded border-stone-300 text-amber-600 w-4 h-4">
+                            <span>Ik ga akkoord met de algemene voorwaarden</span>
                         </label>
                     </div>
-
                     <div class="border-t border-stone-200 pt-4 flex gap-3 mt-6">
-                        <button type="button" onclick="backToCart()" class="flex-1 bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold py-3 rounded-xl transition text-sm">Terug</button>
-                        <button type="submit" id="submitOrderBtn" class="flex-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3 px-6 rounded-xl transition text-sm shadow-md">Bestelling plaatsen</button>
+                        <button type="button" onclick="backToCart()" class="flex-1 bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold py-3 rounded-xl text-sm">Terug</button>
+                        <button type="submit" id="submitOrderBtn" class="flex-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3 px-6 rounded-xl text-sm shadow-md">Bestelling plaatsen</button>
                     </div>
                 </form>
             </div>
-
         </div>
     </div>
 
-    <!-- JAVASCRIPT LOGICA -->
+    <!-- JAVASCRIPT LOGICA MET FIREBASE -->
     <script>
+        // Initialiseer Firebase (Compat)
+        const firebaseConfig = {
+            apiKey: "AIzaSyAw15iv-MQgJ81Lb489lAtzu2I_8flLrfo",
+            authDomain: "borgo-antico-website.firebaseapp.com",
+            projectId: "borgo-antico-website",
+            storageBucket: "borgo-antico-website.firebasestorage.app",
+            messagingSenderId: "93359301533",
+            appId: "1:93359301533:web:dddcec172594d5f89c574"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
         let currentItem = { name: '', price: 1, quantity: 1, note: '' };
         let cart = [];
         let orderType = 'bezorgen';
@@ -289,13 +270,12 @@
         ];
 
         document.addEventListener("DOMContentLoaded", function() {
-            // Vul datum automatisch in op vandaag
             let now = new Date();
             let dateStr = now.toISOString().split('T')[0];
             let dateInput = document.getElementById('custDate');
             if (dateInput) dateInput.value = dateStr;
 
-            // Vul de tijdstappen aan op basis van admin openingstijden
+            checkAndSyncKitchenStatus();
             populateTimeSlots();
 
             let savedUser = localStorage.getItem('borgo_user');
@@ -314,11 +294,9 @@
                 if(remCheck) remCheck.checked = true;
             }
 
-            checkAndSyncKitchenStatus();
             renderDynamicMenu();
         });
 
-        // --- DYNAMISCHE TIJDEN OP BASIS VAN ADMIN OPENINGSTIJDEN ---
         function populateTimeSlots() {
             let timeSelect = document.getElementById('custTime');
             if (!timeSelect) return;
@@ -331,27 +309,31 @@
             let openingHours = JSON.parse(localStorage.getItem('borgo_opening_hours')) || defaultOpeningHours;
             let daySchedule = openingHours.find(h => h.day === dayName);
 
-            let html = '<option value="Zo snel mogelijk">🚀 Zo snel mogelijk (ca. 30 min)</option>';
+            let now = new Date();
+            let isToday = selectedDate.toDateString() === now.toDateString();
+            let currentlyOpen = checkAndSyncKitchenStatus();
+
+            let html = '';
+            if (isToday && currentlyOpen) {
+                html += '<option value="Zo snel mogelijk">🚀 Zo snel mogelijk (ca. 30 min)</option>';
+            }
 
             if (!daySchedule || !daySchedule.open) {
-                html += '<option value="" disabled>Geen openingstijden op deze dag</option>';
+                if (!html) html += '<option value="" disabled>Geen openingstijden op deze dag</option>';
                 timeSelect.innerHTML = html;
                 return;
             }
 
             let [openH, openM] = daySchedule.openTime.split(':').map(Number);
             let [closeH, closeM] = daySchedule.closeTime.split(':').map(Number);
-
-            let now = new Date();
-            let isToday = selectedDate.toDateString() === now.toDateString();
-            
             let minHour = openH;
             let minMinute = openM;
 
-            if (isToday) {
-                now.setMinutes(now.getMinutes() + 30);
-                let curH = now.getHours();
-                let curM = now.getMinutes();
+            if (isToday && currentlyOpen) {
+                let nowPlus30 = new Date();
+                nowPlus30.setMinutes(nowPlus30.getMinutes() + 30);
+                let curH = nowPlus30.getHours();
+                let curM = nowPlus30.getMinutes();
 
                 if (curH > openH || (curH === openH && curM > openM)) {
                     minHour = curH;
@@ -359,10 +341,7 @@
                     let rem = minMinute % 15;
                     if (rem !== 0) {
                         minMinute += (15 - rem);
-                        if (minMinute >= 60) {
-                            minMinute = 0;
-                            minHour += 1;
-                        }
+                        if (minMinute >= 60) { minMinute = 0; minHour += 1; }
                     }
                 }
             }
@@ -380,12 +359,9 @@
             timeSelect.innerHTML = html;
         }
 
-        // --- SLIMME KEUKENSTATUS KOPPELING MET ADMIN.HTML (INCL. VAKANTIE) ---
         function checkAndSyncKitchenStatus() {
             let now = new Date();
-            let todayStr = now.toISOString().split('T')[0]; // YYYY-MM-DD
-
-            // 1. Check eerst of we in een vakantieperiode zitten
+            let todayStr = now.toISOString().split('T')[0];
             let vacations = JSON.parse(localStorage.getItem('borgo_vacations')) || [];
             let activeVacation = vacations.find(v => todayStr >= v.startDate && todayStr <= v.endDate);
             
@@ -396,7 +372,7 @@
                 isOpen = false;
                 vacationStatus = activeVacation;
             } else {
-                let manualOverride = localStorage.getItem('borgo_manual_override'); // 'closed' of 'open'
+                let manualOverride = localStorage.getItem('borgo_manual_override');
                 let expiryTime = parseInt(localStorage.getItem('borgo_override_expiry') || '0', 10);
 
                 if (manualOverride && now.getTime() >= expiryTime) {
@@ -429,21 +405,20 @@
             let title = document.getElementById('frontKitchenTitle');
             let sub = document.getElementById('frontKitchenSub');
 
-            if (isOpen) {
-                banner.classList.add('hidden');
-                localStorage.setItem('borgo_kitchen_open', 'true');
-                if (dot) dot.className = "w-3 h-3 rounded-full bg-green-500 inline-block shrink-0 animate-pulse";
-                if (title) title.innerText = "Open voor bezorgen & afhalen";
-                if (sub) sub.innerText = "Bestel direct of plan voor later.";
-            } else {
-                banner.classList.remove('hidden');
-                localStorage.setItem('borgo_kitchen_open', 'false');
-                if (dot) dot.className = "w-3 h-3 rounded-full bg-red-500 inline-block shrink-0";
-                if (title) {
+            if (banner && dot && title && sub) {
+                if (isOpen) {
+                    banner.classList.add('hidden');
+                    dot.className = "w-3 h-3 rounded-full bg-green-500 inline-block shrink-0 animate-pulse";
+                    title.innerText = "Open voor bezorgen & afhalen";
+                    sub.innerText = "Bestel direct of plan voor later.";
+                } else {
+                    banner.classList.remove('hidden');
+                    dot.className = "w-3 h-3 rounded-full bg-red-500 inline-block shrink-0";
                     title.innerText = vacationStatus ? `Gesloten (Vakantie: ${vacationStatus.startDate} t/m ${vacationStatus.endDate})` : "Gesloten (Buiten openingstijden)";
+                    sub.innerText = "Plan gerust in voor een latere dag!";
                 }
-                if (sub) sub.innerText = "Plan gerust in voor een latere dag!";
             }
+            return isOpen;
         }
 
         function renderDynamicMenu() {
@@ -597,7 +572,6 @@
             let inputCode = document.getElementById('discountInput').value.trim().toUpperCase();
             let msg = document.getElementById('discountMessage');
             let discounts = JSON.parse(localStorage.getItem('borgo_discounts')) || defaultDiscounts;
-
             let foundDiscount = discounts.find(d => d.code === inputCode);
 
             if (foundDiscount) {
@@ -622,6 +596,7 @@
             const modal = document.getElementById('cartModal');
             modal.classList.toggle('hidden');
             setOrderType(orderType);
+            checkAndSyncKitchenStatus();
             populateTimeSlots();
             backToCart(); 
         }
@@ -640,7 +615,7 @@
             document.getElementById('cartStepView').classList.remove('hidden');
         }
 
-        // --- BESTELLING INDIENEN & E-MAIL VERSTUREN ---
+        // --- BESTELLING INDIENEN NAAR FIREBASE & SERVER ---
         async function submitOrder(event) {
             event.preventDefault();
             
@@ -648,6 +623,17 @@
             let errorBox = document.getElementById('deliveryErrorBox');
 
             if (orderType === 'bezorgen') {
+                let street = document.getElementById('custStreet').value;
+                let zip = document.getElementById('custZip').value;
+                let city = document.getElementById('custCity').value;
+                let fullAddress = `${street}, ${zip} ${city}`;
+
+                let confirmAddress = confirm(`Bezorgen we vandaag op dit adres?\n\n📍 ${fullAddress}\n\nKlik op OK (Ja) als dit klopt, of Annuleren (Nee) om het te wijzigen.`);
+                if (!confirmAddress) {
+                    document.getElementById('custStreet').focus();
+                    return;
+                }
+
                 let areas = JSON.parse(localStorage.getItem('borgo_delivery_areas')) || defaultDeliveryAreas;
                 let allowed = false;
 
@@ -655,9 +641,7 @@
                     if (area.active) {
                         let validZips = area.zips.split(',').map(z => z.trim().toUpperCase());
                         validZips.forEach(z => {
-                            if (zipInput.startsWith(z)) {
-                                allowed = true;
-                            }
+                            if (zipInput.startsWith(z)) allowed = true;
                         });
                     }
                 });
@@ -694,8 +678,8 @@
 
             let newOrderForDashboard = {
                 id: "ORD-" + Math.floor(1000 + Math.random() * 9000),
-                orderTime: new Date(),
-                deliveryDate: new Date(customer.date + 'T' + (customer.time === 'Zo snel mogelijk' ? '12:00:00' : customer.time)),
+                orderTime: new Date().toISOString(),
+                deliveryDate: customer.date + ' ' + customer.time,
                 customer: customer.name,
                 email: customer.email,
                 type: customer.type === 'bezorgen' ? 'Bezorgen' : 'Afhalen',
@@ -704,23 +688,24 @@
                 items: cart.map(item => ({ qty: item.quantity, name: item.name, note: item.note })),
                 total: document.getElementById('cartModalTotal').innerText,
                 payment: customer.payment,
-                prepTime: 30, 
-                status: 'nieuw', 
-                expanded: false,
-                isNew: true
+                status: 'nieuw'
             };
 
-            let existingOrders = JSON.parse(localStorage.getItem('borgo_orders')) || [];
-            existingOrders.unshift(newOrderForDashboard);
-            localStorage.setItem('borgo_orders', JSON.stringify(existingOrders));
+            // 1. Opslaan in Firebase Firestore
+            try {
+                await db.collection("orders").add(newOrderForDashboard);
+                console.log("Bestelling succesvol opgeslagen in Firebase!");
+            } catch (err) {
+                console.error("Fout bij opslaan in Firebase:", err);
+            }
 
+            // 2. E-mail verzenden via Netlify function
             try {
                 let response = await fetch('/.netlify/functions/send-order', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ customer: customer, cart: cart })
                 });
-
                 if (!response.ok) {
                     console.error('Fout bij verzenden e-mail via server');
                 }
@@ -733,7 +718,7 @@
             cart = [];
             activeDiscount = null;
             updateCartUI();
-        }
+        };
     </script>
 
     <!-- Footer -->

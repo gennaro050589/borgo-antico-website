@@ -16,6 +16,8 @@
         }
         .animate-alarm { animation: pulse-ring 1.2s infinite; }
     </style>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
 
@@ -90,27 +92,72 @@
 
     <script>
         // ==========================================
-        // HOOFDSTUK 3: CONFIGURATIE & DATA
+        // HOOFDSTUK 3: CONFIGURATIE & FIREBASE KOPPELING
         // ==========================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyAw15iv-MQgJ81Lb489lAtzu2I_8flLrfo",
+            authDomain: "borgo-antico-website.firebaseapp.com",
+            projectId: "borgo-antico-website",
+            storageBucket: "borgo-antico-website.firebasestorage.app",
+            messagingSenderId: "93359301533",
+            appId: "1:93359301533:web:dddcec172594d5f89c574"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
         const CORRECT_PIN = "1234";
         let activeTab = 'bestellingen';
-
         let orders = [];
+        let previousOrderCount = 0;
 
-        // Functie om bestellingen in te laden uit localStorage
-        function loadOrdersFromStorage() {
-            const rawOrders = JSON.parse(localStorage.getItem('borgo_orders')) || [];
-            orders = rawOrders.map(order => ({
-                ...order,
-                orderTime: new Date(order.orderTime),
-                deliveryDate: order.deliveryDate ? new Date(order.deliveryDate) : new Date()
-            }));
+        // Functie om bestellingen live in te laden uit Firebase Firestore
+        function initRealtimeOrders() {
+            db.collection("orders").onSnapshot((snapshot) => {
+                let loadedOrders = [];
+                snapshot.forEach((doc) => {
+                    let data = doc.data();
+                    loadedOrders.push({
+                        firestoreId: doc.id,
+                        id: data.id || doc.id,
+                        customer: data.customer || 'Onbekend',
+                        type: data.type || 'Afhalen',
+                        address: data.address || '',
+                        email: data.email || '',
+                        phone: data.phone || '',
+                        total: data.total || '€ 0,00',
+                        payment: data.payment || 'Contant',
+                        items: data.items || [],
+                        status: data.status || 'nieuw',
+                        prepTime: data.prepTime || 30,
+                        isNew: data.status === 'nieuw',
+                        expanded: false,
+                        orderTime: data.orderTime ? new Date(data.orderTime) : new Date(),
+                        deliveryDate: data.deliveryDate ? new Date(data.deliveryDate.replace(' ', 'T')) : new Date()
+                    });
+                });
+
+                if (loadedOrders.length > previousOrderCount && previousOrderCount !== 0) {
+                    let alarm = document.getElementById('alarm-sound');
+                    if(alarm) alarm.play().catch(e => console.log("Audio autoplay geblokkeerd"));
+                }
+                previousOrderCount = loadedOrders.length;
+                orders = loadedOrders;
+                renderOrders();
+            });
         }
 
-        // Sla op in localStorage en herrender
-        function saveAndRender() {
-            localStorage.setItem('borgo_orders', JSON.stringify(orders));
-            renderOrders();
+        async function updateOrderInFirebase(order) {
+            try {
+                const snapshot = await db.collection("orders").where("id", "==", order.id).get();
+                snapshot.forEach(async (doc) => {
+                    await db.collection("orders").doc(doc.id).update({
+                        status: order.status,
+                        prepTime: order.prepTime
+                    });
+                });
+            } catch (err) {
+                console.error("Fout bij bijwerken in Firebase:", err);
+            }
         }
 
         // ==========================================
@@ -123,26 +170,16 @@
                 document.getElementById('login-modal').classList.add('hidden');
                 document.getElementById('app-container').classList.remove('hidden');
                 startClock();
-                loadOrdersFromStorage();
-                renderOrders();
+                initRealtimeOrders();
             } else {
                 document.getElementById('login-error').classList.remove('hidden');
             }
         }
 
         function startClock() {
-            // Elke seconde de klok bijwerken én elke 3 seconden automatisch controleren op nieuwe bestellingen
-            let counter = 0;
             setInterval(() => {
                 const now = new Date();
                 document.getElementById('live-clock').innerText = now.toLocaleTimeString('nl-NL');
-                
-                counter++;
-                if (counter >= 3) { // Elke 3 seconden
-                    counter = 0;
-                    loadOrdersFromStorage();
-                    renderOrders();
-                }
             }, 1000);
         }
 
@@ -174,8 +211,11 @@
             return d > today;
         }
 
-        function calculateExpectedTime(orderTime, prepMinutes) {
-            return new Date(orderTime.getTime() + prepMinutes * 60000);
+        function calculateExpectedTime(order) {
+            if (order.deliveryDate && !order.isAsap) {
+                return new Date(order.deliveryDate);
+            }
+            return new Date(order.orderTime.getTime() + (order.prepTime || 30) * 60000);
         }
 
         function formatTime(dateObj) {
@@ -187,7 +227,7 @@
         }
 
         // ==========================================
-        // HOOFDSTUK 5: RENDEREN & INTERACTIONELEN
+        // HOOFDSTUK 5: RENDEREN & INTERACTIE
         // ==========================================
         function renderOrders() {
             const now = new Date();
@@ -198,14 +238,13 @@
             let afgerondCount = 0;
 
             const processedOrders = orders.map(order => {
-                const expDate = calculateExpectedTime(order.orderTime, order.prepTime);
+                const expDate = calculateExpectedTime(order);
                 const diffMs = expDate - now;
                 const diffMins = diffMs / 60000;
 
                 let category = 'bestellingen';
 
                 if (order.status === 'afgerond') {
-                    // Oude afgeronde bestellingen van eerdere dagen verbergen we van de keukentablet
                     if (!isToday(order.deliveryDate)) {
                         category = 'historie';
                     } else {
@@ -241,7 +280,7 @@
                     <div class="py-20 text-center text-slate-500">
                         <p class="text-4xl mb-2">📂</p>
                         <p class="text-lg">Geen bestellingen in deze categorie.</p>
-                        <p class="text-xs mt-1">Bestellingen worden automatisch op datum en tijd ingedeeld.</p>
+                        <p class="text-xs mt-1">Bestellingen komen hier automatisch binnen zodra een klant afrekent.</p>
                     </div>
                 `;
                 return;
@@ -267,7 +306,6 @@
                 `).join('');
 
                 card.innerHTML = `
-                    <!-- Compacte balk -->
                     <div onclick="toggleExpand('${order.id}')" class="p-4 flex items-center justify-between cursor-pointer hover:bg-slate-800/40 transition select-none">
                         <div class="flex items-center space-x-4">
                             <span class="text-xs uppercase tracking-wider font-semibold px-2.5 py-1 rounded-full ${order.type === 'Bezorgen' ? 'bg-blue-500/20 text-blue-400' : 'bg-emerald-500/20 text-emerald-400'}">
@@ -276,7 +314,7 @@
                             <div>
                                 <div class="flex items-center space-x-2">
                                     <h3 class="font-bold text-base text-white">${order.customer}</h3>
-                                    ${order.isNew ? '<span class="bg-rose-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider animate-pulse">NEW</span>' : ''}
+                                    ${order.status === 'nieuw' ? '<span class="bg-rose-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider animate-pulse">NIEUW</span>' : ''}
                                     <span class="text-xs text-slate-400">• ${order.address}</span>
                                 </div>
                                 <span class="text-xs text-slate-400">Ontvangen om ${orderTimeStr} ${!isToday(order.deliveryDate) ? '• Levering: ' + deliveryDateStr : ''}</span>
@@ -294,7 +332,6 @@
                         </div>
                     </div>
 
-                    <!-- Uitgeklapte details -->
                     <div class="${order.expanded ? 'block' : 'hidden'} border-t border-slate-800 p-5 bg-slate-950/40 space-y-4">
                         <div>
                             <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Bestelde Producten:</h4>
@@ -341,10 +378,7 @@
             const order = orders.find(o => o.id === id);
             if(order) {
                 order.expanded = !order.expanded;
-                if(order.expanded && order.isNew) {
-                    order.isNew = false;
-                }
-                saveAndRender();
+                renderOrders();
             }
         }
 
@@ -352,7 +386,7 @@
             const order = orders.find(o => o.id === id);
             if(order) {
                 order.prepTime = Math.max(5, order.prepTime + amount);
-                saveAndRender();
+                updateOrderInFirebase(order);
             }
         }
 
@@ -361,8 +395,7 @@
             if(order) {
                 order.status = 'geaccepteerd';
                 order.expanded = false;
-                order.isNew = false;
-                saveAndRender();
+                updateOrderInFirebase(order);
             }
         }
 
@@ -371,45 +404,11 @@
             if(order) {
                 order.status = 'afgerond';
                 order.expanded = false;
-                order.isNew = false;
-                saveAndRender(); 
-                scheduleReviewEmail(order);
+                updateOrderInFirebase(order);
             }
         }
 
         function printReceipt(id) {
             alert("Bon is succesvol naar de keukenprinter gestuurd!");
         }
-
-        // ==========================================
-        // HOOFDSTUK 6: MAIL AUTOMATISATIE
-        // ==========================================
-        function sendInstantConfirmationEmail(order) {
-            const subject = "Bedankt voor je bestelling bij Borgo Antico! 🍕";
-            const body = `Hoi ${order.customer},\n\nBedankt voor je bestelling! We hebben hem in goede orde ontvangen en onze keuken is er direct mee aan de slag gegaan.\n\nJe bestelling wordt verwacht om ${formatTime(order.expDate)}.\n\nTot zo!\nTeam Borgo Antico`;
-            console.log(`[MAIL 1 - DIRECT VERZONDEN NAAR ${order.email}]`);
-        }
-
-        function sendScheduledConfirmationEmail(order) {
-            const subject = "Je vooruitbestelling bij Borgo Antico is ingepland! 🕒";
-            const body = `Hoi ${order.customer},\n\nBedankt voor je vooruitbestelling! We hebben deze veilig voor je ingepland voor ${formatDate(order.deliveryDate)} om ${formatTime(order.expDate)}.\n\nTeam Borgo Antico`;
-            console.log(`[MAIL 2 - GEPLAND VERZONDEN NAAR ${order.email}]`);
-        }
-
-        function sendInternalBackupEmail(order) {
-            const subject = `🔔 Nieuwe online bestelling (${order.id})`;
-            const body = `Nieuwe bestelling binnengekomen:\n- Klant: ${order.customer}\n- Type: ${order.type}\n- Verwachte tijd: ${formatTime(order.expDate)}\n- Totaal: ${order.total}`;
-            console.log(`[INTERNE BACK-UP NAAR info@borgoantico.online]`);
-        }
-
-        function scheduleReviewEmail(order) {
-            const subject = "Hoe heeft het gesmaakt bij Borgo Antico? 🌟";
-            const body = `Hoi ${order.customer},\n\nWe zijn benieuwd naar je ervaring!\nTeam Borgo Antico`;
-            console.log(`[MAIL 3 - REVIEW GEPLAND]`);
-        }
-
-        loadOrdersFromStorage();
-        renderOrders();
     </script>
-</body>
-</html>
