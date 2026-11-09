@@ -340,9 +340,15 @@
                             </ul>
                         </div>
 
-                        <div class="flex justify-between items-center text-xs text-slate-300 bg-slate-900 p-3 rounded-xl border border-slate-800">
-                            <span>Betaalstatus:</span>
-                            <span class="font-medium text-emerald-400">${order.payment}</span>
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center text-xs text-slate-300 bg-slate-900 p-3 rounded-xl border border-slate-800 gap-2">
+                            <div>
+                                <span class="text-slate-400">Betaalstatus:</span>
+                                <span class="font-medium text-emerald-400 ml-1">${order.payment}</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-400">Tel:</span>
+                                <a href="tel:${order.phone || ''}" class="text-amber-400 hover:underline font-mono font-bold ml-1">${order.phone || 'Geen tel. opgegeven'}</a>
+                            </div>
                         </div>
 
                         <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
