@@ -41,6 +41,7 @@ exports.handler = async (event) => {
                 <p style="margin: 4px 0;"><b>Type bestelling:</b> ${customer.type ? customer.type.toUpperCase() : ''}</p>
                 <p style="margin: 4px 0;"><b>Gewenste tijd:</b> ${customer.date} om ${customer.time}</p>
                 <p style="margin: 4px 0;"><b>Betaalwijze:</b> ${customer.payment}</p>
+                <p style="margin: 4px 0;"><b>Telefoonnummer:</b> <a href="tel:${customer.phone || ''}" style="color: inherit; text-decoration: none;">${customer.phone || 'Niet opgegeven'}</a></p>
                 ${customer.type === 'bezorgen' ? `<p style="margin: 4px 0;"><b>Bezorgadres:</b> ${customer.street}, ${customer.zip} ${customer.city}</p>` : `<p style="margin: 4px 0;"><b>Afhaallocatie:</b> Dorpsstraat 63, Zevenhuizen</p>`}
                 ${customer.driverNote ? `<p style="margin: 4px 0;"><b>Opmerking:</b> ${customer.driverNote}</p>` : ''}
                 
